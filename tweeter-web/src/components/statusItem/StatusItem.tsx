@@ -1,21 +1,22 @@
-import { User } from "tweeter-shared";
 import { Link } from "react-router-dom";
+import Post from "../statusItem/Post";
+import { Status } from "tweeter-shared";
 import useUserNavigation from "../userInfo/UserNavigationHook";
 
 interface Props {
-  value: User;
+    item: Status;
 }
 
-const UserItem = (props: Props) => {
+const StatusItem = (props: Props) => {
   const { navigateToUser } = useUserNavigation();
-
+  
   return (
     <div className="col bg-light mx-0 px-0">
       <div className="container px-0">
         <div className="row mx-0 px-0">
           <div className="col-auto p-3">
             <img
-              src={props.value.imageUrl}
+              src={props.item.user.imageUrl}
               className="img-fluid"
               width="80"
               alt="Posting user"
@@ -24,21 +25,24 @@ const UserItem = (props: Props) => {
           <div className="col">
             <h2>
               <b>
-                {props.value.firstName} {props.value.lastName}
+                {props.item.user.firstName} {props.item.user.lastName}
               </b>{" "}
               -{" "}
               <Link
-                to={props.value.alias}
+                to={props.item.user.alias}
                 onClick={(event) => navigateToUser(event)}
               >
-                {props.value.alias}
+                {props.item.user.alias}
               </Link>
             </h2>
+            {props.item.formattedDate}
+            <br />
+            <Post status={props.item} />
           </div>
         </div>
       </div>
     </div>
   );
-};
+}
 
-export default UserItem;
+export default StatusItem;

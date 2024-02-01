@@ -1,8 +1,8 @@
-import { AuthToken, User } from "tweeter-shared";
+import { AuthToken, Status, User } from "tweeter-shared";
 import { useState, useRef, useEffect } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
-import UserItem from "../userItem/UserItem";
 import useToastListener from "../toaster/ToastListenerHook";
+import StatusItem from "../statusItem/StatusItem";
 import useUserInfo from "../userInfo/UserInfoHook";
 
 export const PAGE_SIZE = 10;
@@ -12,23 +12,24 @@ interface Props {
     authToken: AuthToken,
     user: User,
     pageSize: number,
-    lastItem: User | null
-  ) => Promise<[User[], boolean]>;
+    lastItem: Status | null
+  ) => Promise<[Status[], boolean]>;
+
   itemDescription: string;
 }
 
-const UserItemScroller = (props: Props) => {
+const StatusItemScroller = (props: Props) => {
   const { displayErrorMessage } = useToastListener();
-  const [items, setItems] = useState<User[]>([]);
+  const [items, setItems] = useState<Status[]>([]);
   const [hasMoreItems, setHasMoreItems] = useState(true);
-  const [lastItem, setLastItem] = useState<User | null>(null);
+  const [lastItem, setLastItem] = useState<Status | null>(null);
 
   // Required to allow the addItems method to see the current value of 'items'
   // instead of the value from when the closure was created.
   const itemsReference = useRef(items);
   itemsReference.current = items;
 
-  const addItems = (newItems: User[]) =>
+  const addItems = (newItems: Status[]) =>
     setItems([...itemsReference.current, ...newItems]);
 
   const { displayedUser, authToken } = useUserInfo();
@@ -74,12 +75,14 @@ const UserItemScroller = (props: Props) => {
             key={index}
             className="row mb-3 mx-0 px-0 border rounded bg-white"
           >
-            <UserItem value={item} />
+            <StatusItem item={item} />
           </div>
         ))}
       </InfiniteScroll>
     </div>
   );
-};
 
-export default UserItemScroller;
+}
+
+
+export default StatusItemScroller;
