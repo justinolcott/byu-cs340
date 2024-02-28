@@ -1,7 +1,7 @@
 import { Buffer } from "buffer";
-import { AuthenticationPresenter, LoginView } from "./AuthenticationPresenter";
+import { AuthenticationPresenter, AuthentificationView } from "./AuthenticationPresenter";
 
-export interface RegisterView extends LoginView {
+export interface RegisterView extends AuthentificationView {
     setImageUrl: (url: string) => void;
     setImageBytes: (bytes: Uint8Array) => void;
 }

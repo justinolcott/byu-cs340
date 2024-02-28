@@ -8,7 +8,7 @@ import AuthentificationFormFields from "../AuthentificationFormFields";
 import useUserInfo from "../../userInfo/UserInfoHook";
 import { LoginPresenter } from "../../../presenter/LoginPresenter";
 import { AuthToken, User } from "tweeter-shared";
-import { LoginView } from "../../../presenter/AuthenticationPresenter";
+import { AuthentificationView } from "../../../presenter/AuthenticationPresenter";
 
 interface Props {
   originalUrl?: string;
@@ -26,7 +26,7 @@ const Login = (props: Props) => {
   const rememberMeRef = useRef(rememberMe);
   rememberMeRef.current = rememberMe;
 
-  const listener: LoginView = {
+  const listener: AuthentificationView = {
     updateUserInfo: (user: User, displayedUser: User, authToken: AuthToken) => {
       updateUserInfo(user, displayedUser, authToken, rememberMeRef.current);
     },

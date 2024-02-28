@@ -1,8 +1,8 @@
-import { AuthenticationPresenter, LoginView } from "./AuthenticationPresenter";
+import { AuthenticationPresenter, AuthentificationView } from "./AuthenticationPresenter";
 
 
-export class LoginPresenter extends AuthenticationPresenter<LoginView> {
-  constructor(view: LoginView) {
+export class LoginPresenter extends AuthenticationPresenter<AuthentificationView> {
+  constructor(view: AuthentificationView) {
       super(view);
   }
 
