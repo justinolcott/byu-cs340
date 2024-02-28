@@ -3,10 +3,12 @@ import "bootstrap/dist/css/bootstrap.css";
 import { useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthenticationFormLayout from "../AuthenticationFormLayout";
-import { AuthToken, FakeData, User } from "tweeter-shared";
 import useToastListener from "../../toaster/ToastListenerHook";
 import AuthentificationFormFields from "../AuthentificationFormFields";
 import useUserInfo from "../../userInfo/UserInfoHook";
+import { LoginPresenter } from "../../../presenter/LoginPresenter";
+import { AuthToken, User } from "tweeter-shared";
+import { LoginView } from "../../../presenter/AuthenticationPresenter";
 
 interface Props {
   originalUrl?: string;
@@ -24,40 +26,22 @@ const Login = (props: Props) => {
   const rememberMeRef = useRef(rememberMe);
   rememberMeRef.current = rememberMe;
 
-  const checkSubmitButtonStatus = (): boolean => {
-    return !alias || !password;
+  const listener: LoginView = {
+    updateUserInfo: (user: User, displayedUser: User, authToken: AuthToken) => {
+      updateUserInfo(user, displayedUser, authToken, rememberMeRef.current);
+    },
+    navigate: navigate,
+    displayErrorMessage: displayErrorMessage,
   };
+
+  let [presenter] = useState(new LoginPresenter(listener));
 
   const doLogin = async () => {
-    try {
-      let [user, authToken] = await login(alias, password);
-
-      updateUserInfo(user, user, authToken, rememberMeRef.current);
-
-      if (!!props.originalUrl) {
-        navigate(props.originalUrl);
-      } else {
-        navigate("/");
-      }
-    } catch (error) {
-      displayErrorMessage(
-        `Failed to log user in because of exception: ${error}`
-      );
-    }
+    await presenter.doLogin(alias, password, props.originalUrl);
   };
 
-  const login = async (
-    alias: string,
-    password: string
-  ): Promise<[User, AuthToken]> => {
-    // TODO: Replace with the result of calling the server
-    let user = FakeData.instance.firstUser;
-
-    if (user === null) {
-      throw new Error("Invalid alias or password");
-    }
-
-    return [user, FakeData.instance.authToken];
+  const checkSubmitButtonStatus = (): boolean => {
+    return !alias || !password;
   };
 
   const inputFieldGenerator = () => {
