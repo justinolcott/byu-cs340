@@ -18,6 +18,9 @@ export abstract class PagedItemPresenter<T, U> extends Presenter<PagedItemView<T
   }
 
   protected abstract createService(): U;
+  // protected createService(): U {
+  //   return new U();
+  // }
 
   public get hasMoreItems() {
     return this._hasMoreItems;

@@ -12,6 +12,7 @@ import { AuthentificationView } from "../../../presenter/AuthenticationPresenter
 
 interface Props {
   originalUrl?: string;
+  presenter?: LoginPresenter;
 }
 
 const Login = (props: Props) => {
@@ -34,7 +35,7 @@ const Login = (props: Props) => {
     displayErrorMessage: displayErrorMessage,
   };
 
-  let [presenter] = useState(new LoginPresenter(listener));
+  let [presenter] = useState(props.presenter ?? new LoginPresenter(listener));
 
   const doLogin = async () => {
     await presenter.doLogin(alias, password, props.originalUrl);
