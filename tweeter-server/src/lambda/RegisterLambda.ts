@@ -4,7 +4,7 @@ import { UserService } from "../model/service/UserService";
 export const handler = async (event: RegisterRequest): Promise<any> => {
   try {
     let [user, token] = await new UserService().register(event.firstName, event.lastName, event.alias, event.password, event.userImageString);
-    return TweeterResponseFactory.createAuthenticateResponse(true, user, token);
+    return TweeterResponseFactory.createAuthenticateResponse(true, user.dto, token.dto);
   }
   catch (e) {
     throw new Error(`400: ${e}`);

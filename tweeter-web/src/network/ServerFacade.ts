@@ -2,8 +2,9 @@ import { AuthenticateResponse, GetUserRequest, GetUserResponse, LoginRequest, Re
 import { ClientCommunicator } from "./ClientCommunicator";
 import { LoadMoreFollowsRequest } from 'tweeter-shared';
 import { LoadMoreFollowsResponse } from 'tweeter-shared';
-import { LoadMoreStatusesRequest } from 'tweeter-shared/dist/model/net/Request';
-import { LoadMoreStatusesResponse } from 'tweeter-shared/dist/model/net/Response';
+import { LoadMoreStatusesRequest, LoadMoreStatusesResponse } from 'tweeter-shared';
+import { PostStatusRequest, PostStatusResponse } from 'tweeter-shared';
+
 
 export class ServerFacade {
   private SERVER_URL: string = "https://bcd7nyx1si.execute-api.us-east-1.amazonaws.com/prod/";
@@ -42,5 +43,10 @@ export class ServerFacade {
   async loadMoreFeedItems(request: LoadMoreStatusesRequest): Promise<LoadMoreStatusesResponse> {
     const endpoint = "service/loadMoreFeedItems";
     return await this.clientCommunicator.doPost<LoadMoreStatusesRequest, LoadMoreStatusesResponse>(request, endpoint);
+  }
+
+  async postStatus(request: PostStatusRequest): Promise<PostStatusResponse> {
+    const endpoint = "service/postStatus";
+    return await this.clientCommunicator.doPost<PostStatusRequest, PostStatusResponse>(request, endpoint);
   }
 }

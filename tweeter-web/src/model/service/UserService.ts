@@ -20,8 +20,8 @@ export class UserService {
 
 
     
-    console.log("RESPONSE: ", response.user);
-    console.log("IS NULL", response.user === null);
+    // console.log("RESPONSE: ", response.user);
+    // console.log("IS NULL", response.user === null);
     const user = new User(
       response.user.firstName,
       response.user.lastName,
@@ -31,7 +31,7 @@ export class UserService {
 
     const authToken = new AuthToken(response.token.token,
       response.token.timestamp);
-    console.log("USER AFTER: ", user);
+    // console.log("USER AFTER: ", user);
 
     if (user === null) {
       throw new Error("Invalid user in login");
@@ -59,11 +59,22 @@ export class UserService {
     if (!response.success) {
       throw new Error("Invalid registration");
     }
-    const user = User.fromDto(response.user);
+
+    const user =  new User(
+      response.user.firstName,
+      response.user.lastName,
+      response.user.alias,
+      response.user.imageUrl
+    );
+
+    const authToken = new AuthToken(response.token.token,
+      response.token.timestamp);
+
     if (user === null) {
-      throw new Error("Invalid user in registration");
+      throw new Error("Invalid user in register");
     }
-    return [user, response.token];
+
+    return [user, authToken];
     //   new RegisterRequest(firstName, lastName, alias, password, 
     //     Buffer.from(userImageBytes).toString("base64"))
     // );
@@ -83,7 +94,7 @@ export class UserService {
     if (user === null) {
       throw new Error("Invalid user in getUser");
     }
-    console.log("USER: ", user);
+    // console.log("USER: ", user);
     return user;
     //   new GetUserRequest(authToken, alias)
     // );

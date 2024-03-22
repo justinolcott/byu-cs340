@@ -5,7 +5,8 @@ import { StatusService } from "../model/service/StatusService";
 export const handler = async (event: LoadMoreStatusesRequest): Promise<LoadMoreStatusesResponse> => {
   try {
     let [statuses, hasMore] = await new StatusService().loadMoreFeedItems(event.authToken, event.user, event.pageSize, event.lastItem);
-    return TweeterResponseFactory.createLoadMoreStatusesResponse(true, statuses, hasMore);
+    let statusesDto = statuses.map((status) => status.dto);
+    return TweeterResponseFactory.createLoadMoreStatusesResponse(true, statusesDto, hasMore);
   }
   catch (e) {
     throw new Error(`400: ${e}`);

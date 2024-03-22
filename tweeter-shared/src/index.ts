@@ -26,5 +26,8 @@ export type { LoadMoreFollowsResponse } from "./model/net/Response";
 export type { LoadMoreStatusesRequest } from "./model/net/Request";
 export type { LoadMoreStatusesResponse } from "./model/net/Response";
 
+export type { PostStatusRequest } from "./model/net/Request";
+export type { PostStatusResponse } from "./model/net/Response";
+
 export { TweeterRequestFactory } from "./model/net/Request";
 export { TweeterResponseFactory } from "./model/net/Response";

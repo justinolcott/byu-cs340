@@ -54,5 +54,14 @@ export class StatusService {
     await new Promise((f) => setTimeout(f, 2000));
 
     // TODO: Call the server to post the status
+    const response = await this.server.postStatus(
+      TweeterRequestFactory.createPostStatusRequest(authToken, newStatus)
+    );
+    if (!response.success) {
+      throw new Error("Invalid status in postStatus");
+    }
+
+    // return response;
+    return;
   };
 }

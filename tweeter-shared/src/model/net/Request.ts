@@ -39,6 +39,11 @@ export interface LoadMoreStatusesRequest extends TweeterRequest {
   lastItem: Status | null;
 }
 
+export interface PostStatusRequest extends TweeterRequest {
+  authToken: AuthToken;
+  newStatus: Status;
+}
+
 export class TweeterRequestFactory {
   static createLoginRequest(username: string, password: string): LoginRequest {
     return { username, password };
@@ -58,6 +63,10 @@ export class TweeterRequestFactory {
 
   static createLoadMoreStatusesRequest(authToken: AuthToken, user: User, pageSize: number, lastItem: Status | null): LoadMoreStatusesRequest {
     return { authToken, user, pageSize, lastItem };
+  }
+
+  static createPostStatusRequest(authToken: AuthToken, newStatus: Status): PostStatusRequest {
+    return { authToken, newStatus};
   }
 }
 

@@ -8,5 +8,5 @@ export const handler = async (event: GetUserRequest): Promise<GetUserResponse> =
     return TweeterResponseFactory.createGetUserResponse(false, null, "User not found");
   }
   // return new GetUserResponse(true, user);
-  return TweeterResponseFactory.createGetUserResponse(true, user);
+  return TweeterResponseFactory.createGetUserResponse(true, user.dto);
 }

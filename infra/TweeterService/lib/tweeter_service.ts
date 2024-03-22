@@ -364,6 +364,50 @@ export class TweeterService extends Construct {
     });
 
     
+    // POST STATUS
+    const postStatusLambda = new NodejsFunction(this, "PostStatusHandler", {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      entry: lambda_dir + "PostStatusLambda.ts",
+      handler: "handler",
+    });
+
+    const postStatus = service.addResource("postStatus", {
+      defaultCorsPreflightOptions: {
+        allowOrigins: apigateway.Cors.ALL_ORIGINS,
+        allowMethods: apigateway.Cors.ALL_METHODS,
+      },
+    });
+
+    const postStatusIntegration = new apigateway.LambdaIntegration(postStatusLambda, {
+      proxy: false,
+      integrationResponses: [
+        {
+          statusCode: "200",
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': "'*'",
+            'method.response.header.Access-Control-Allow-Methods': "'*'",
+            'method.response.header.Access-Control-Allow-Headers': "'*'",
+          },
+
+        },
+      ],
+    });
+
+
+    postStatus.addMethod("POST", postStatusIntegration, {
+      methodResponses: [
+      {
+        statusCode: "200",
+        responseParameters: {
+          'method.response.header.Access-Control-Allow-Origin': true,
+          'method.response.header.Access-Control-Allow-Methods': true,
+          'method.response.header.Access-Control-Allow-Headers': true,
+        },
+      },
+      ],
+    });
+
+    
 
 
   }

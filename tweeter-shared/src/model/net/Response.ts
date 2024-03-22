@@ -29,6 +29,10 @@ export interface LoadMoreStatusesResponse extends TweeterResponse {
   readonly hasMorePages: boolean;
 }
 
+export interface PostStatusResponse extends TweeterResponse {
+  
+}
+
 export class TweeterResponseFactory {
   static createAuthenticateResponse(
     success: boolean,
@@ -63,6 +67,13 @@ export class TweeterResponseFactory {
     message: string | null = null
   ): LoadMoreStatusesResponse {
     return { success, statuses, hasMorePages, message };
+  }
+
+  static createPostStatusResponse(
+    success: boolean,
+    message: string | null = null
+  ): PostStatusResponse {
+    return { success, message };
   }
 }
 

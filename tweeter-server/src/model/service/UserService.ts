@@ -10,9 +10,6 @@ export class UserService {
         throw new Error("Invalid alias or password");
       }
       return [user, FakeData.instance.authToken];
-
-      
-
   };
 
   public async logout(authToken: AuthToken): Promise<void> {
@@ -31,11 +28,9 @@ export class UserService {
 
     // TODO: Replace with the result of calling the server
     let user = FakeData.instance.firstUser;
-
     if (user === null) {
       throw new Error("Invalid registration");
     }
-
     return [user, FakeData.instance.authToken];
   };
 
