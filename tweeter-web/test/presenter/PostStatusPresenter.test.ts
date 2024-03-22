@@ -54,5 +54,6 @@ describe("PostStatusPresenter", () => {
     verify(mockPostStatusView.displayErrorMessage("Failed to post status because of exception: An error occurred")).once();
     verify(mockPostStatusView.clearLastInfoMessage()).never();
     verify(mockPostStatusView.setPost("")).never();
+    verify(mockPostStatusView.displayInfoMessage("Status posted!", 2000)).never();
   });
 });

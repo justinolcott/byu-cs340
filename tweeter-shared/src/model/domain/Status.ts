@@ -1,3 +1,4 @@
+import { StatusDto } from "../dto/StatusDto";
 import { PostSegment, Type } from "./PostSegment";
 import { User } from "./User";
 import moment from "moment";
@@ -243,35 +244,69 @@ export class Status {
     );
   }
 
-  public static fromJson(json: string | null | undefined): Status | null {
-    if (!!json) {
-      let jsonObject: {
-        _post: string;
-        _user: {
-          _firstName: string;
-          _lastName: string;
-          _alias: string;
-          _imageUrl: string;
-        };
-        _timestamp: number;
-        _segments: PostSegment[];
-      } = JSON.parse(json);
-      return new Status(
-        jsonObject._post,
-        new User(
-          jsonObject._user._firstName,
-          jsonObject._user._lastName,
-          jsonObject._user._alias,
-          jsonObject._user._imageUrl
-        ),
-        jsonObject._timestamp
-      );
+  public static fromJsonString(json: string | null | undefined): Status | null {
+    return json ? this.fromDto(JSON.parse(json)) : null;
+  }
+
+  public static fromDto(dto: StatusDto | null | undefined): Status | null {
+    if (dto) {
+      const user = User.fromDto(dto.user);
+      if (user) {
+        return new Status(dto.post, user, dto.timestamp);
+      } else {
+        return null;
+      }
     } else {
       return null;
     }
   }
 
-  public toJson(): string {
-    return JSON.stringify(this);
+  public get dto(): StatusDto {
+    return {
+      post: this.post,
+      user: this.user.dto,
+      timestamp: this.timestamp,
+      segments: this.segments,
+    };
   }
+
+  public toJson(): string {
+    return JSON.stringify(this.dto);
+  }
+
+
+
+
+
+  // public static fromJson(json: string | null | undefined): Status | null {
+  //   if (!!json) {
+  //     let jsonObject: {
+  //       _post: string;
+  //       _user: {
+  //         _firstName: string;
+  //         _lastName: string;
+  //         _alias: string;
+  //         _imageUrl: string;
+  //       };
+  //       _timestamp: number;
+  //       _segments: PostSegment[];
+  //     } = JSON.parse(json);
+  //     return new Status(
+  //       jsonObject._post,
+  //       new User(
+  //         jsonObject._user._firstName,
+  //         jsonObject._user._lastName,
+  //         jsonObject._user._alias,
+  //         jsonObject._user._imageUrl
+  //       ),
+  //       jsonObject._timestamp
+  //     );
+  //   } else {
+  //     return null;
+  //   }
+  // }
+
+  // public toJson(): string {
+  //   return JSON.stringify(this);
+  // }
 }

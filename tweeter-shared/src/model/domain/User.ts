@@ -1,3 +1,5 @@
+import { UserDto } from "../dto/UserDto";
+
 export class User {
   private _firstName: string;
   private _lastName: string;
@@ -56,26 +58,28 @@ export class User {
     return this._alias === other._alias;
   }
 
-  public static fromJson(json: string | null | undefined): User | null {
-    if (!!json) {
-      let jsonObject: {
-        _firstName: string;
-        _lastName: string;
-        _alias: string;
-        _imageUrl: string;
-      } = JSON.parse(json);
-      return new User(
-        jsonObject._firstName,
-        jsonObject._lastName,
-        jsonObject._alias,
-        jsonObject._imageUrl
-      );
-    } else {
-      return null;
-    }
+  public static fromJsonString(json: string | null | undefined): User | null {
+    return json ? this.fromDto(JSON.parse(json)) : null;
+  }
+
+  public static fromDto(dto: UserDto | null | undefined): User | null {
+    return dto ? new User(dto.firstName, dto.lastName, dto.alias, dto.imageUrl) : null;
+  }
+  
+  public get dto(): UserDto {
+    return {
+      firstName: this._firstName,
+      lastName: this._lastName,
+      alias: this._alias,
+      imageUrl: this._imageUrl
+    };
   }
 
   public toJson(): string {
-    return JSON.stringify(this);
+    return JSON.stringify(this.dto);
+  }
+
+  public static fromJson(json: string | null): User | null {
+    return User.fromJsonString(json);
   }
 }

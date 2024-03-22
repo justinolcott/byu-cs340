@@ -1,4 +1,5 @@
 import { v4 as uuid } from "uuid";
+import { AuthTokenDto } from "../dto/AuthTokenDto";
 export class AuthToken {
   private _token: string;
   private _timestamp: number;
@@ -46,6 +47,25 @@ export class AuthToken {
     this._timestamp = value;
   }
 
+  public static fromJsonString(json: string | null | undefined): AuthToken | null {
+    return json ? this.fromDto(JSON.parse(json)) : null;
+  }
+
+  public static fromDto(dto: AuthTokenDto | null | undefined): AuthToken | null {
+    return dto ? new AuthToken(dto.token, dto.timestamp) : null;
+  }
+
+  public get dto(): AuthTokenDto {
+    return {
+      token: this.token,
+      timestamp: this.timestamp,
+    };
+  }
+
+  public toJson(): string {
+    return JSON.stringify(this.dto);
+  }
+
   public static fromJson(json: string | null | undefined): AuthToken | null {
     if (!!json) {
       let jsonObject: { _token: string; _timestamp: number } = JSON.parse(json);
@@ -55,7 +75,7 @@ export class AuthToken {
     }
   }
 
-  public toJson(): string {
-    return JSON.stringify(this);
-  }
+  // public toJson(): string {
+  //   return JSON.stringify(this);
+  // }
 }
