@@ -1,6 +1,9 @@
 import { AuthToken } from "../domain/AuthToken";
 import { Status } from "../domain/Status";
 import { User } from "../domain/User";
+import { AuthTokenDto } from "../dto/AuthTokenDto";
+import { StatusDto } from "../dto/StatusDto";
+import { UserDto } from "../dto/UserDto";
 
 // abstract??
 export interface TweeterRequest {
@@ -26,23 +29,56 @@ export interface GetUserRequest extends TweeterRequest {
 }
 
 export interface LoadMoreFollowsRequest extends TweeterRequest {
-  authToken: AuthToken;
-  user: User;
+  authToken: AuthTokenDto;
+  user: UserDto;
   pageSize: number;
-  lastItem: User | null;
+  lastItem: UserDto | null;
 }
 
 export interface LoadMoreStatusesRequest extends TweeterRequest {
-  authToken: AuthToken;
-  user: User;
+  authToken: AuthTokenDto;
+  user: UserDto;
   pageSize: number;
-  lastItem: Status | null;
+  lastItem: StatusDto | null;
 }
 
 export interface PostStatusRequest extends TweeterRequest {
   authToken: AuthToken;
   newStatus: Status;
 }
+
+export interface LogoutRequest extends TweeterRequest {
+  authToken: AuthToken;
+}
+
+export interface FollowRequest extends TweeterRequest {
+  authToken: AuthTokenDto;
+  userToFollow: UserDto;
+}
+
+export interface UnfollowRequest extends TweeterRequest {
+  authToken: AuthTokenDto;
+  userToUnfollow: UserDto;
+}
+
+export interface GetIsFollowerStatusRequest extends TweeterRequest {
+  authToken: AuthTokenDto;
+  user: UserDto;
+  selectedUser: UserDto;
+}
+
+export interface GetFolloweesCountRequest extends TweeterRequest {
+  authToken: AuthTokenDto;
+  user: UserDto;
+}
+
+export interface GetFollowersCountRequest extends TweeterRequest {
+  authToken: AuthTokenDto;
+  user: UserDto;
+}
+
+
+
 
 export class TweeterRequestFactory {
   static createLoginRequest(username: string, password: string): LoginRequest {
@@ -57,16 +93,40 @@ export class TweeterRequestFactory {
     return { authToken, alias };
   }
 
-  static createLoadMoreFollowsRequest(authToken: AuthToken, user: User, pageSize: number, lastItem: User | null): LoadMoreFollowsRequest {
+  static createLoadMoreFollowsRequest(authToken: AuthTokenDto, user: UserDto, pageSize: number, lastItem: UserDto | null): LoadMoreFollowsRequest {
     return { authToken, user, pageSize, lastItem };
   }
 
-  static createLoadMoreStatusesRequest(authToken: AuthToken, user: User, pageSize: number, lastItem: Status | null): LoadMoreStatusesRequest {
+  static createLoadMoreStatusesRequest(authToken: AuthTokenDto, user: UserDto, pageSize: number, lastItem: StatusDto | null): LoadMoreStatusesRequest {
     return { authToken, user, pageSize, lastItem };
   }
 
   static createPostStatusRequest(authToken: AuthToken, newStatus: Status): PostStatusRequest {
     return { authToken, newStatus};
+  }
+
+  static createLogoutRequest(authToken: AuthToken): LogoutRequest {
+    return { authToken };
+  }
+
+  static createFollowRequest(authToken: AuthTokenDto, userToFollow: UserDto): FollowRequest {
+    return { authToken, userToFollow };
+  }
+
+  static createUnfollowRequest(authToken: AuthTokenDto, userToUnfollow: UserDto): UnfollowRequest {
+    return { authToken, userToUnfollow };
+  }
+
+  static createGetIsFollowerStatusRequest(authToken: AuthTokenDto, user: UserDto, selectedUser: UserDto): GetIsFollowerStatusRequest {
+    return { authToken, user, selectedUser };
+  }
+
+  static createGetFolloweesCountRequest(authToken: AuthTokenDto, user: UserDto): GetFolloweesCountRequest {
+    return { authToken, user };
+  }
+
+  static createGetFollowersCountRequest(authToken: AuthTokenDto, user: UserDto): GetFollowersCountRequest {
+    return { authToken, user };
   }
 }
 

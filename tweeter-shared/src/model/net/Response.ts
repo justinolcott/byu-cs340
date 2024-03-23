@@ -33,6 +33,32 @@ export interface PostStatusResponse extends TweeterResponse {
   
 }
 
+export interface LogoutResponse extends TweeterResponse {
+    
+}
+
+export interface FollowResponse extends TweeterResponse {
+  followersCount: number;
+  followingCount: number;
+}
+
+export interface UnfollowResponse extends TweeterResponse {
+  followersCount: number;
+  followeesCount: number;
+}
+
+export interface GetIsFollowerStatusResponse extends TweeterResponse {
+  isFollower: boolean;
+}
+
+export interface GetFollowersCountResponse extends TweeterResponse {
+  followersCount: number;
+}
+
+export interface GetFolloweesCountResponse extends TweeterResponse {
+  followeesCount: number;
+}
+
 export class TweeterResponseFactory {
   static createAuthenticateResponse(
     success: boolean,
@@ -74,6 +100,55 @@ export class TweeterResponseFactory {
     message: string | null = null
   ): PostStatusResponse {
     return { success, message };
+  }
+
+  static createLogoutResponse(
+    success: boolean,
+    message: string | null = null
+  ): LogoutResponse {
+    return { success, message };
+  }
+
+  static createFollowResponse(
+    success: boolean,
+    followersCount: number,
+    followingCount: number,
+    message: string | null = null
+  ): FollowResponse {
+    return { success, followersCount, followingCount, message };
+  }
+
+  static createUnfollowResponse(
+    success: boolean,
+    followersCount: number,
+    followeesCount: number,
+    message: string | null = null
+  ): UnfollowResponse {
+    return { success, followersCount, followeesCount, message };
+  }
+
+  static createGetIsFollowerStatusResponse(
+    success: boolean,
+    isFollower: boolean,
+    message: string | null = null
+  ): GetIsFollowerStatusResponse {
+    return { success, isFollower, message };
+  }
+
+  static createGetFollowersCountResponse(
+    success: boolean,
+    followersCount: number,
+    message: string | null = null
+  ): GetFollowersCountResponse {
+    return { success, followersCount, message };
+  }
+
+  static createGetFolloweesCountResponse(
+    success: boolean,
+    followeesCount: number,
+    message: string | null = null
+  ): GetFolloweesCountResponse {
+    return { success, followeesCount, message };
   }
 }
 

@@ -274,6 +274,10 @@ export class Status {
     return JSON.stringify(this.dto);
   }
 
+  public static fromJson(json: string | null): Status | null {
+    return Status.fromJsonString(json);
+  }
+
 
 
 

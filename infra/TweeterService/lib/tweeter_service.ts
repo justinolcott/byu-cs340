@@ -407,8 +407,256 @@ export class TweeterService extends Construct {
       ],
     });
 
-    
+    // LOGOUT
+    const logoutLambda = new NodejsFunction(this, "LogoutHandler", {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      entry: lambda_dir + "LogoutLambda.ts",
+      handler: "handler",
+    });
 
+    const logout = service.addResource("logout", {
+      defaultCorsPreflightOptions: {
+        allowOrigins: apigateway.Cors.ALL_ORIGINS,
+        allowMethods: apigateway.Cors.ALL_METHODS,
+      },
+    });
 
+    const logoutIntegration = new apigateway.LambdaIntegration(logoutLambda, {
+      proxy: false,
+      integrationResponses: [
+        {
+          statusCode: "200",
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': "'*'",
+            'method.response.header.Access-Control-Allow-Methods': "'*'",
+            'method.response.header.Access-Control-Allow-Headers': "'*'",
+          },
+
+        },
+      ],
+    });
+
+    logout.addMethod("POST", logoutIntegration, {
+      methodResponses: [
+      {
+        statusCode: "200",
+        responseParameters: {
+          'method.response.header.Access-Control-Allow-Origin': true,
+          'method.response.header.Access-Control-Allow-Methods': true,
+          'method.response.header.Access-Control-Allow-Headers': true,
+        },
+      },
+      ],
+    });
+
+    // FOLLOW
+    const followLambda = new NodejsFunction(this, "FollowHandler", {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      entry: lambda_dir + "FollowLambda.ts",
+      handler: "handler",
+    });
+
+    const follow = service.addResource("follow", {
+      defaultCorsPreflightOptions: {
+        allowOrigins: apigateway.Cors.ALL_ORIGINS,
+        allowMethods: apigateway.Cors.ALL_METHODS,
+      },
+    });
+
+    const followIntegration = new apigateway.LambdaIntegration(followLambda, {
+      proxy: false,
+      integrationResponses: [
+        {
+          statusCode: "200",
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': "'*'",
+            'method.response.header.Access-Control-Allow-Methods': "'*'",
+            'method.response.header.Access-Control-Allow-Headers': "'*'",
+          },
+
+        },
+      ],
+    });
+
+    follow.addMethod("POST", followIntegration, {
+      methodResponses: [
+      {
+        statusCode: "200",
+        responseParameters: {
+          'method.response.header.Access-Control-Allow-Origin': true,
+          'method.response.header.Access-Control-Allow-Methods': true,
+          'method.response.header.Access-Control-Allow-Headers': true,
+        },
+      },
+      ],
+    });
+
+    // UNFOLLOW
+    const unfollowLambda = new NodejsFunction(this, "UnfollowHandler", {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      entry: lambda_dir + "UnfollowLambda.ts",
+      handler: "handler",
+    });
+
+    const unfollow = service.addResource("unfollow", {
+      defaultCorsPreflightOptions: {
+        allowOrigins: apigateway.Cors.ALL_ORIGINS,
+        allowMethods: apigateway.Cors.ALL_METHODS,
+      },
+    });
+
+    const unfollowIntegration = new apigateway.LambdaIntegration(unfollowLambda, {
+      proxy: false,
+      integrationResponses: [
+        {
+          statusCode: "200",
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': "'*'",
+            'method.response.header.Access-Control-Allow-Methods': "'*'",
+            'method.response.header.Access-Control-Allow-Headers': "'*'",
+          },
+
+        },
+      ],
+    });
+
+    unfollow.addMethod("POST", unfollowIntegration, {
+      methodResponses: [
+      {
+        statusCode: "200",
+        responseParameters: {
+          'method.response.header.Access-Control-Allow-Origin': true,
+          'method.response.header.Access-Control-Allow-Methods': true,
+          'method.response.header.Access-Control-Allow-Headers': true,
+        },
+      },
+      ],
+    });
+
+    // GetIsFollowerStatus
+    const getIsFollowerStatusLambda = new NodejsFunction(this, "GetIsFollowerStatusHandler", {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      entry: lambda_dir + "GetIsFollowerStatusLambda.ts",
+      handler: "handler",
+    });
+
+    const getIsFollowerStatus = service.addResource("getIsFollowerStatus", {
+      defaultCorsPreflightOptions: {
+        allowOrigins: apigateway.Cors.ALL_ORIGINS,
+        allowMethods: apigateway.Cors.ALL_METHODS,
+      },
+    });
+
+    const getIsFollowerStatusIntegration = new apigateway.LambdaIntegration(getIsFollowerStatusLambda, {
+      proxy: false,
+      integrationResponses: [
+        {
+          statusCode: "200",
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': "'*'",
+            'method.response.header.Access-Control-Allow-Methods': "'*'",
+            'method.response.header.Access-Control-Allow-Headers': "'*'",
+          },
+
+        },
+      ],
+    });
+
+    getIsFollowerStatus.addMethod("POST", getIsFollowerStatusIntegration, {
+      methodResponses: [
+      {
+        statusCode: "200",
+        responseParameters: {
+          'method.response.header.Access-Control-Allow-Origin': true,
+          'method.response.header.Access-Control-Allow-Methods': true,
+          'method.response.header.Access-Control-Allow-Headers': true,
+        },
+      },
+      ],
+    });
+
+    // GetFollowersCount
+    const getFollowersCountLambda = new NodejsFunction(this, "GetFollowersCountHandler", {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      entry: lambda_dir + "GetFollowersCountLambda.ts",
+      handler: "handler",
+    });
+
+    const getFollowersCount = service.addResource("getFollowersCount", {
+      defaultCorsPreflightOptions: {
+        allowOrigins: apigateway.Cors.ALL_ORIGINS,
+        allowMethods: apigateway.Cors.ALL_METHODS,
+      },
+    });
+
+    const getFollowersCountIntegration = new apigateway.LambdaIntegration(getFollowersCountLambda, {
+      proxy: false,
+      integrationResponses: [
+        {
+          statusCode: "200",
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': "'*'",
+            'method.response.header.Access-Control-Allow-Methods': "'*'",
+            'method.response.header.Access-Control-Allow-Headers': "'*'",
+          },
+
+        },
+      ],
+    });
+
+    getFollowersCount.addMethod("POST", getFollowersCountIntegration, {
+      methodResponses: [
+      {
+        statusCode: "200",
+        responseParameters: {
+          'method.response.header.Access-Control-Allow-Origin': true,
+          'method.response.header.Access-Control-Allow-Methods': true,
+          'method.response.header.Access-Control-Allow-Headers': true,
+        },
+      },
+      ],
+    });
+
+    // GetFolloweesCount
+    const getFolloweesCountLambda = new NodejsFunction(this, "GetFolloweesCountHandler", {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      entry: lambda_dir + "GetFolloweesCountLambda.ts",
+      handler: "handler",
+    });
+
+    const getFolloweesCount = service.addResource("getFolloweesCount", {
+      defaultCorsPreflightOptions: {
+        allowOrigins: apigateway.Cors.ALL_ORIGINS,
+        allowMethods: apigateway.Cors.ALL_METHODS,
+      },
+    });
+
+    const getFolloweesCountIntegration = new apigateway.LambdaIntegration(getFolloweesCountLambda, {
+      proxy: false,
+      integrationResponses: [
+        {
+          statusCode: "200",
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': "'*'",
+            'method.response.header.Access-Control-Allow-Methods': "'*'",
+            'method.response.header.Access-Control-Allow-Headers': "'*'",
+          },
+
+        },
+      ],
+    });
+
+    getFolloweesCount.addMethod("POST", getFolloweesCountIntegration, {
+      methodResponses: [
+      {
+        statusCode: "200",
+        responseParameters: {
+          'method.response.header.Access-Control-Allow-Origin': true,
+          'method.response.header.Access-Control-Allow-Methods': true,
+          'method.response.header.Access-Control-Allow-Headers': true,
+        },
+      },
+      ],
+    });
   }
 }

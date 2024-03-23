@@ -12,13 +12,23 @@ export class StatusService {
     lastItem: Status | null
     ): Promise<[Status[], boolean]> {
       // TODO: Replace with the result of calling server
+      let authTokenDto = authToken.dto;
+      let userDto = user.dto;
+      const letItemDto = lastItem?.dto ?? null;
       const responses = await this.server.loadMoreStoryItems(
-        TweeterRequestFactory.createLoadMoreStatusesRequest(authToken, user, pageSize, lastItem)
+        TweeterRequestFactory.createLoadMoreStatusesRequest(
+          authTokenDto,
+          userDto,
+          pageSize,
+          letItemDto
+        )
       );
+
       let statuses = responses.statuses.map((status) => Status.fromDto(status));
       if (statuses.includes(null)) {
         throw new Error("Invalid status in loadMoreStoryItems");
       }
+
       return [statuses, responses.hasMorePages] as [Status[], boolean];
       //   new LoadMoreStatusesRequest(authToken, user, pageSize, lastItem)
       // );
@@ -33,8 +43,16 @@ export class StatusService {
     ): Promise<[Status[], boolean]> {
       console.log("Last Item: ", lastItem);
       // TODO: Replace with the result of calling server
+      let authTokenDto = authToken.dto;
+      let userDto = user.dto;
+      const letItemDto = lastItem?.dto ?? null;
       const responses = await this.server.loadMoreFeedItems(
-        TweeterRequestFactory.createLoadMoreStatusesRequest(authToken, user, pageSize, lastItem)
+        TweeterRequestFactory.createLoadMoreStatusesRequest(
+          authTokenDto,
+          userDto,
+          pageSize,
+          letItemDto
+        )
       );
       let statuses = responses.statuses.map((status) => Status.fromDto(status));
       if (statuses.includes(null)) {

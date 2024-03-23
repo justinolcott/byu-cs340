@@ -17,8 +17,6 @@ export class UserService {
     if (!response.success) {
       throw new Error("Invalid alias or password");
     }
-
-
     
     // console.log("RESPONSE: ", response.user);
     // console.log("IS NULL", response.user === null);
@@ -43,6 +41,13 @@ export class UserService {
   public async logout(authToken: AuthToken): Promise<void> {
     // Pause so we can see the logging out message. Delete when the call to the server is implemented.
     await new Promise((res) => setTimeout(res, 1000));
+    const response = await this.server.logout(
+      TweeterRequestFactory.createLogoutRequest(authToken)
+    );
+    if (!response.success) {
+      throw new Error("Invalid logout");
+    }
+    return;
   };
 
   public async register(
@@ -108,8 +113,17 @@ export class UserService {
     lastItem: User | null
   ): Promise<[User[], boolean]> {
     // TODO: Replace with the result of calling server
+
+    let authTokenDto = authToken.dto;
+    let userDto = user.dto;
+    const letItemDto = lastItem?.dto ?? null;
     const response = await this.server.loadMoreFollowers(
-      TweeterRequestFactory.createLoadMoreFollowsRequest(authToken, user, pageSize, lastItem)
+      TweeterRequestFactory.createLoadMoreFollowsRequest(
+        authTokenDto,
+        userDto,
+        pageSize,
+        letItemDto
+      )
     );
 
     let users = response.users.map((user) => User.fromDto(user));
@@ -131,8 +145,16 @@ export class UserService {
     lastItem: User | null
   ): Promise<[User[], boolean]> {
     // TODO: Replace with the result of calling server
+    let authTokenDto = authToken.dto;
+    let userDto = user.dto;
+    const letItemDto = lastItem?.dto ?? null;
     const response = await this.server.loadMoreFollowees(
-      TweeterRequestFactory.createLoadMoreFollowsRequest(authToken, user, pageSize, lastItem)
+      TweeterRequestFactory.createLoadMoreFollowsRequest(
+        authTokenDto,
+        userDto,
+        pageSize,
+        letItemDto
+      )
     );
 
     let users = response.users.map((user) => User.fromDto(user));
