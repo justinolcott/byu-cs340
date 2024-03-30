@@ -68,6 +68,30 @@ export class TweeterService extends Construct {
             "application/json": "$input.json('$')",
           },
         },
+        {
+          // [Login Error] string match
+          selectionPattern: "\\[Login Error\\].*",
+          statusCode: "400",
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': "'*'",
+            'method.response.header.Access-Control-Allow-Methods': "'*'",
+            'method.response.header.Access-Control-Allow-Headers': "'*'",
+          },
+          responseTemplates: {
+            "application/json": "$input.json('$')",
+          },
+          
+        },
+        {
+          // 500 error
+          selectionPattern: "/^5\\d{2}$/",
+          statusCode: "500",
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': "'*'",
+            'method.response.header.Access-Control-Allow-Methods': "'*'",
+            'method.response.header.Access-Control-Allow-Headers': "'*'",
+          },
+        }
       ],
     });
 
@@ -84,6 +108,28 @@ export class TweeterService extends Construct {
         "application/json": responseModel,
         },
       },
+      {
+        statusCode: "400",
+        responseParameters: {
+          'method.response.header.Access-Control-Allow-Origin': true,
+          'method.response.header.Access-Control-Allow-Methods': true,
+          'method.response.header.Access-Control-Allow-Headers': true,
+        },
+        responseModels: {
+        "application/json": responseModel,
+        },
+      },
+      {
+        statusCode: "500",
+        responseParameters: {
+          'method.response.header.Access-Control-Allow-Origin': true,
+          'method.response.header.Access-Control-Allow-Methods': true,
+          'method.response.header.Access-Control-Allow-Headers': true,
+        },
+        responseModels: {
+        "application/json": responseModel,
+        },
+      }
       ],
     });
 
@@ -103,9 +149,6 @@ export class TweeterService extends Construct {
 
     const registerIntegration = new apigateway.LambdaIntegration(registerLambda, {
       proxy: false,
-      // requestTemplates: {
-      //   "application/json": '{ "statusCode": "200" }',
-      // },
       integrationResponses: [
         {
           statusCode: "200",
@@ -115,17 +158,26 @@ export class TweeterService extends Construct {
             'method.response.header.Access-Control-Allow-Methods': "'*'",
             'method.response.header.Access-Control-Allow-Headers': "'*'",
           },
-          // responseTemplates: {
-          //   "application/json": "$input.json('$')",
-          // },
         },
-
         {
-          selectionPattern: "4\\d{2}",
+          // [Register Error] string match
+          selectionPattern: "\\[Register Error\\].*",
           statusCode: "400",
-          // responseTemplates: {
-          //   "application/json": "$input.json('$')",
-          // },
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': "'*'",
+            'method.response.header.Access-Control-Allow-Methods': "'*'",
+            'method.response.header.Access-Control-Allow-Headers': "'*'",
+          },
+        },
+        {
+          // 500 error
+          selectionPattern: "/^5\\d{2}$/",
+          statusCode: "500",
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': "'*'",
+            'method.response.header.Access-Control-Allow-Methods': "'*'",
+            'method.response.header.Access-Control-Allow-Headers': "'*'",
+          },
         }
       ],
     });
@@ -139,11 +191,23 @@ export class TweeterService extends Construct {
           'method.response.header.Access-Control-Allow-Methods': true,
           'method.response.header.Access-Control-Allow-Headers': true,
         },
-        // responseModels: {
-        // "application/json": responseModel,
-        // },
-
       },
+      {
+        statusCode: "400",
+        responseParameters: {
+          'method.response.header.Access-Control-Allow-Origin': true,
+          'method.response.header.Access-Control-Allow-Methods': true,
+          'method.response.header.Access-Control-Allow-Headers': true,
+        },
+      },
+      {
+        statusCode: "500",
+        responseParameters: {
+          'method.response.header.Access-Control-Allow-Origin': true,
+          'method.response.header.Access-Control-Allow-Methods': true,
+          'method.response.header.Access-Control-Allow-Headers': true,
+        },
+      }
       ],
     });
 
@@ -163,9 +227,6 @@ export class TweeterService extends Construct {
 
     const getUserIntegration = new apigateway.LambdaIntegration(getUserLambda, {
       proxy: false,
-      // requestTemplates: {
-      //   "application/json": '{ "statusCode": "200" }',
-      // },
       integrationResponses: [
         {
           statusCode: "200",
@@ -176,6 +237,26 @@ export class TweeterService extends Construct {
           },
 
         },
+        {
+          // [GetUser Error] string match
+          selectionPattern: "\\[GetUser Error\\].*",
+          statusCode: "400",
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': "'*'",
+            'method.response.header.Access-Control-Allow-Methods': "'*'",
+            'method.response.header.Access-Control-Allow-Headers': "'*'",
+          },
+        },
+        {
+          // 500 error
+          selectionPattern: "/^5\\d{2}$/",
+          statusCode: "500",
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': "'*'",
+            'method.response.header.Access-Control-Allow-Methods': "'*'",
+            'method.response.header.Access-Control-Allow-Headers': "'*'",
+          },
+        }
       ],
     });
 
@@ -188,10 +269,23 @@ export class TweeterService extends Construct {
           'method.response.header.Access-Control-Allow-Methods': true,
           'method.response.header.Access-Control-Allow-Headers': true,
         },
-        // responseModels: {
-        // "application/json": responseModel,
-        // },
       },
+      {
+        statusCode: "400",
+        responseParameters: {
+          'method.response.header.Access-Control-Allow-Origin': true,
+          'method.response.header.Access-Control-Allow-Methods': true,
+          'method.response.header.Access-Control-Allow-Headers': true,
+        },
+      },
+      {
+        statusCode: "500",
+        responseParameters: {
+          'method.response.header.Access-Control-Allow-Origin': true,
+          'method.response.header.Access-Control-Allow-Methods': true,
+          'method.response.header.Access-Control-Allow-Headers': true,
+        },
+      }
       ],
     });
 
@@ -219,8 +313,27 @@ export class TweeterService extends Construct {
             'method.response.header.Access-Control-Allow-Methods': "'*'",
             'method.response.header.Access-Control-Allow-Headers': "'*'",
           },
-
         },
+        {
+          // [LoadMoreFollowers Error] string match
+          selectionPattern: "\\[LoadMoreFollowers Error\\].*",
+          statusCode: "400",
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': "'*'",
+            'method.response.header.Access-Control-Allow-Methods': "'*'",
+            'method.response.header.Access-Control-Allow-Headers': "'*'",
+          },
+        },
+        {
+          // 500 error
+          selectionPattern: "/^5\\d{2}$/",
+          statusCode: "500",
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': "'*'",
+            'method.response.header.Access-Control-Allow-Methods': "'*'",
+            'method.response.header.Access-Control-Allow-Headers': "'*'",
+          },
+        }
       ],
     });
 
@@ -234,6 +347,22 @@ export class TweeterService extends Construct {
           'method.response.header.Access-Control-Allow-Headers': true,
         },
       },
+      {
+        statusCode: "400",
+        responseParameters: {
+          'method.response.header.Access-Control-Allow-Origin': true,
+          'method.response.header.Access-Control-Allow-Methods': true,
+          'method.response.header.Access-Control-Allow-Headers': true,
+        },
+      },
+      {
+        statusCode: "500",
+        responseParameters: {
+          'method.response.header.Access-Control-Allow-Origin': true,
+          'method.response.header.Access-Control-Allow-Methods': true,
+          'method.response.header.Access-Control-Allow-Headers': true,
+        },
+      }
       ],
     });
 
@@ -263,6 +392,26 @@ export class TweeterService extends Construct {
           },
 
         },
+        {
+          // [LoadMoreFollowees Error] string match
+          selectionPattern: "\\[LoadMoreFollowees Error\\].*",
+          statusCode: "400",
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': "'*'",
+            'method.response.header.Access-Control-Allow-Methods': "'*'",
+            'method.response.header.Access-Control-Allow-Headers': "'*'",
+          },
+        },
+        {
+          // 500 error
+          selectionPattern: "/^5\\d{2}$/",
+          statusCode: "500",
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': "'*'",
+            'method.response.header.Access-Control-Allow-Methods': "'*'",
+            'method.response.header.Access-Control-Allow-Headers': "'*'",
+          },
+        }
       ],
     });
 
@@ -276,6 +425,22 @@ export class TweeterService extends Construct {
           'method.response.header.Access-Control-Allow-Headers': true,
         },
       },
+      {
+        statusCode: "400",
+        responseParameters: {
+          'method.response.header.Access-Control-Allow-Origin': true,
+          'method.response.header.Access-Control-Allow-Methods': true,
+          'method.response.header.Access-Control-Allow-Headers': true,
+        },
+      },
+      {
+        statusCode: "500",
+        responseParameters: {
+          'method.response.header.Access-Control-Allow-Origin': true,
+          'method.response.header.Access-Control-Allow-Methods': true,
+          'method.response.header.Access-Control-Allow-Headers': true,
+        },
+      }
       ],
     });
 
@@ -305,6 +470,26 @@ export class TweeterService extends Construct {
           },
 
         },
+        {
+          // [LoadMoreFeedItems Error] string match
+          selectionPattern: "\\[LoadMoreFeedItems Error\\].*",
+          statusCode: "400",
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': "'*'",
+            'method.response.header.Access-Control-Allow-Methods': "'*'",
+            'method.response.header.Access-Control-Allow-Headers': "'*'",
+          },
+        },
+        {
+          // 500 error
+          selectionPattern: "/^5\\d{2}$/",
+          statusCode: "500",
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': "'*'",
+            'method.response.header.Access-Control-Allow-Methods': "'*'",
+            'method.response.header.Access-Control-Allow-Headers': "'*'",
+          },
+        }
       ],
     });
 
@@ -318,6 +503,22 @@ export class TweeterService extends Construct {
           'method.response.header.Access-Control-Allow-Headers': true,
         },
       },
+      {
+        statusCode: "400",
+        responseParameters: {
+          'method.response.header.Access-Control-Allow-Origin': true,
+          'method.response.header.Access-Control-Allow-Methods': true,
+          'method.response.header.Access-Control-Allow-Headers': true,
+        },
+      },
+      {
+        statusCode: "500",
+        responseParameters: {
+          'method.response.header.Access-Control-Allow-Origin': true,
+          'method.response.header.Access-Control-Allow-Methods': true,
+          'method.response.header.Access-Control-Allow-Headers': true,
+        },
+      }
       ],
     });
 
@@ -347,6 +548,26 @@ export class TweeterService extends Construct {
           },
 
         },
+        {
+          // [LoadMoreStoryItems Error] string match
+          selectionPattern: "\\[LoadMoreStoryItems Error\\].*",
+          statusCode: "400",
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': "'*'",
+            'method.response.header.Access-Control-Allow-Methods': "'*'",
+            'method.response.header.Access-Control-Allow-Headers': "'*'",
+          },
+        },
+        {
+          // 500 error
+          selectionPattern: "/^5\\d{2}$/",
+          statusCode: "500",
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': "'*'",
+            'method.response.header.Access-Control-Allow-Methods': "'*'",
+            'method.response.header.Access-Control-Allow-Headers': "'*'",
+          },
+        }
       ],
     });
 
@@ -360,6 +581,22 @@ export class TweeterService extends Construct {
           'method.response.header.Access-Control-Allow-Headers': true,
         },
       },
+      {
+        statusCode: "400",
+        responseParameters: {
+          'method.response.header.Access-Control-Allow-Origin': true,
+          'method.response.header.Access-Control-Allow-Methods': true,
+          'method.response.header.Access-Control-Allow-Headers': true,
+        },
+      },
+      {
+        statusCode: "500",
+        responseParameters: {
+          'method.response.header.Access-Control-Allow-Origin': true,
+          'method.response.header.Access-Control-Allow-Methods': true,
+          'method.response.header.Access-Control-Allow-Headers': true,
+        },
+      }
       ],
     });
 
@@ -390,6 +627,26 @@ export class TweeterService extends Construct {
           },
 
         },
+        {
+          // [PostStatus Error] string match
+          selectionPattern: "\\[PostStatus Error\\].*",
+          statusCode: "400",
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': "'*'",
+            'method.response.header.Access-Control-Allow-Methods': "'*'",
+            'method.response.header.Access-Control-Allow-Headers': "'*'",
+          },
+        },
+        {
+          // 500 error
+          selectionPattern: "/^5\\d{2}$/",
+          statusCode: "500",
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': "'*'",
+            'method.response.header.Access-Control-Allow-Methods': "'*'",
+            'method.response.header.Access-Control-Allow-Headers': "'*'",
+          },
+        }
       ],
     });
 
@@ -404,6 +661,22 @@ export class TweeterService extends Construct {
           'method.response.header.Access-Control-Allow-Headers': true,
         },
       },
+      {
+        statusCode: "400",
+        responseParameters: {
+          'method.response.header.Access-Control-Allow-Origin': true,
+          'method.response.header.Access-Control-Allow-Methods': true,
+          'method.response.header.Access-Control-Allow-Headers': true,
+        },
+      },
+      {
+        statusCode: "500",
+        responseParameters: {
+          'method.response.header.Access-Control-Allow-Origin': true,
+          'method.response.header.Access-Control-Allow-Methods': true,
+          'method.response.header.Access-Control-Allow-Headers': true,
+        },
+      }
       ],
     });
 
@@ -433,6 +706,26 @@ export class TweeterService extends Construct {
           },
 
         },
+        {
+          // [Logout Error] string match
+          selectionPattern: "\\[Logout Error\\].*",
+          statusCode: "400",
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': "'*'",
+            'method.response.header.Access-Control-Allow-Methods': "'*'",
+            'method.response.header.Access-Control-Allow-Headers': "'*'",
+          },
+        },
+        {
+          // 500 error
+          selectionPattern: "/^5\\d{2}$/",
+          statusCode: "500",
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': "'*'",
+            'method.response.header.Access-Control-Allow-Methods': "'*'",
+            'method.response.header.Access-Control-Allow-Headers': "'*'",
+          },
+        }
       ],
     });
 
@@ -446,6 +739,22 @@ export class TweeterService extends Construct {
           'method.response.header.Access-Control-Allow-Headers': true,
         },
       },
+      {
+        statusCode: "400",
+        responseParameters: {
+          'method.response.header.Access-Control-Allow-Origin': true,
+          'method.response.header.Access-Control-Allow-Methods': true,
+          'method.response.header.Access-Control-Allow-Headers': true,
+        },
+      },
+      {
+        statusCode: "500",
+        responseParameters: {
+          'method.response.header.Access-Control-Allow-Origin': true,
+          'method.response.header.Access-Control-Allow-Methods': true,
+          'method.response.header.Access-Control-Allow-Headers': true,
+        },
+      }
       ],
     });
 
@@ -475,6 +784,26 @@ export class TweeterService extends Construct {
           },
 
         },
+        {
+          // [Follow Error] string match
+          selectionPattern: "\\[Follow Error\\].*",
+          statusCode: "400",
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': "'*'",
+            'method.response.header.Access-Control-Allow-Methods': "'*'",
+            'method.response.header.Access-Control-Allow-Headers': "'*'",
+          },
+        },
+        {
+          // 500 error
+          selectionPattern: "/^5\\d{2}$/",
+          statusCode: "500",
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': "'*'",
+            'method.response.header.Access-Control-Allow-Methods': "'*'",
+            'method.response.header.Access-Control-Allow-Headers': "'*'",
+          },
+        }
       ],
     });
 
@@ -488,13 +817,29 @@ export class TweeterService extends Construct {
           'method.response.header.Access-Control-Allow-Headers': true,
         },
       },
+      {
+        statusCode: "400",
+        responseParameters: {
+          'method.response.header.Access-Control-Allow-Origin': true,
+          'method.response.header.Access-Control-Allow-Methods': true,
+          'method.response.header.Access-Control-Allow-Headers': true,
+        },
+      },
+      {
+        statusCode: "500",
+        responseParameters: {
+          'method.response.header.Access-Control-Allow-Origin': true,
+          'method.response.header.Access-Control-Allow-Methods': true,
+          'method.response.header.Access-Control-Allow-Headers': true,
+        },
+      }
       ],
     });
 
     // UNFOLLOW
     const unfollowLambda = new NodejsFunction(this, "UnfollowHandler", {
       runtime: lambda.Runtime.NODEJS_20_X,
-      entry: lambda_dir + "UnfollowLambda.ts",
+      entry: lambda_dir + "UnFollowLambda.ts",
       handler: "handler",
     });
 
@@ -517,6 +862,26 @@ export class TweeterService extends Construct {
           },
 
         },
+        {
+          // [Unfollow Error] string match
+          selectionPattern: "\\[Unfollow Error\\].*",
+          statusCode: "400",
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': "'*'",
+            'method.response.header.Access-Control-Allow-Methods': "'*'",
+            'method.response.header.Access-Control-Allow-Headers': "'*'",
+          },
+        },
+        {
+          // 500 error
+          selectionPattern: "/^5\\d{2}$/",
+          statusCode: "500",
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': "'*'",
+            'method.response.header.Access-Control-Allow-Methods': "'*'",
+            'method.response.header.Access-Control-Allow-Headers': "'*'",
+          },
+        }
       ],
     });
 
@@ -530,6 +895,22 @@ export class TweeterService extends Construct {
           'method.response.header.Access-Control-Allow-Headers': true,
         },
       },
+      {
+        statusCode: "400",
+        responseParameters: {
+          'method.response.header.Access-Control-Allow-Origin': true,
+          'method.response.header.Access-Control-Allow-Methods': true,
+          'method.response.header.Access-Control-Allow-Headers': true,
+        },
+      },
+      {
+        statusCode: "500",
+        responseParameters: {
+          'method.response.header.Access-Control-Allow-Origin': true,
+          'method.response.header.Access-Control-Allow-Methods': true,
+          'method.response.header.Access-Control-Allow-Headers': true,
+        },
+      }
       ],
     });
 
@@ -559,6 +940,26 @@ export class TweeterService extends Construct {
           },
 
         },
+        {
+          // [GetIsFollowerStatus Error] string match
+          selectionPattern: "\\[GetIsFollowerStatus Error\\].*",
+          statusCode: "400",
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': "'*'",
+            'method.response.header.Access-Control-Allow-Methods': "'*'",
+            'method.response.header.Access-Control-Allow-Headers': "'*'",
+          },
+        },
+        {
+          // 500 error
+          selectionPattern: "/^5\\d{2}$/",
+          statusCode: "500",
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': "'*'",
+            'method.response.header.Access-Control-Allow-Methods': "'*'",
+            'method.response.header.Access-Control-Allow-Headers': "'*'",
+          },
+        }
       ],
     });
 
@@ -572,6 +973,22 @@ export class TweeterService extends Construct {
           'method.response.header.Access-Control-Allow-Headers': true,
         },
       },
+      {
+        statusCode: "400",
+        responseParameters: {
+          'method.response.header.Access-Control-Allow-Origin': true,
+          'method.response.header.Access-Control-Allow-Methods': true,
+          'method.response.header.Access-Control-Allow-Headers': true,
+        },
+      },
+      {
+        statusCode: "500",
+        responseParameters: {
+          'method.response.header.Access-Control-Allow-Origin': true,
+          'method.response.header.Access-Control-Allow-Methods': true,
+          'method.response.header.Access-Control-Allow-Headers': true,
+        },
+      }
       ],
     });
 
@@ -601,6 +1018,26 @@ export class TweeterService extends Construct {
           },
 
         },
+        {
+          // [GetFollowersCount Error] string match
+          selectionPattern: "\\[GetFollowersCount Error\\].*",
+          statusCode: "400",
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': "'*'",
+            'method.response.header.Access-Control-Allow-Methods': "'*'",
+            'method.response.header.Access-Control-Allow-Headers': "'*'",
+          },
+        },
+        {
+          // 500 error
+          selectionPattern: "/^5\\d{2}$/",
+          statusCode: "500",
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': "'*'",
+            'method.response.header.Access-Control-Allow-Methods': "'*'",
+            'method.response.header.Access-Control-Allow-Headers': "'*'",
+          },
+        }
       ],
     });
 
@@ -614,6 +1051,22 @@ export class TweeterService extends Construct {
           'method.response.header.Access-Control-Allow-Headers': true,
         },
       },
+      {
+        statusCode: "400",
+        responseParameters: {
+          'method.response.header.Access-Control-Allow-Origin': true,
+          'method.response.header.Access-Control-Allow-Methods': true,
+          'method.response.header.Access-Control-Allow-Headers': true,
+        },
+      },
+      {
+        statusCode: "500",
+        responseParameters: {
+          'method.response.header.Access-Control-Allow-Origin': true,
+          'method.response.header.Access-Control-Allow-Methods': true,
+          'method.response.header.Access-Control-Allow-Headers': true,
+        },
+      }
       ],
     });
 
@@ -643,6 +1096,24 @@ export class TweeterService extends Construct {
           },
 
         },
+        {
+          selectionPattern: "\\[GetFolloweesCount Error\\].*",
+          statusCode: "400",
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': "'*'",
+            'method.response.header.Access-Control-Allow-Methods': "'*'",
+            'method.response.header.Access-Control-Allow-Headers': "'*'",
+          },
+        },
+        {
+          selectionPattern: "/^5\\d{2}$/",
+          statusCode: "500",
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': "'*'",
+            'method.response.header.Access-Control-Allow-Methods': "'*'",
+            'method.response.header.Access-Control-Allow-Headers': "'*'",
+          },
+        }
       ],
     });
 
@@ -656,6 +1127,22 @@ export class TweeterService extends Construct {
           'method.response.header.Access-Control-Allow-Headers': true,
         },
       },
+      {
+        statusCode: "400",
+        responseParameters: {
+          'method.response.header.Access-Control-Allow-Origin': true,
+          'method.response.header.Access-Control-Allow-Methods': true,
+          'method.response.header.Access-Control-Allow-Headers': true,
+        },
+      },
+      {
+        statusCode: "500",
+        responseParameters: {
+          'method.response.header.Access-Control-Allow-Origin': true,
+          'method.response.header.Access-Control-Allow-Methods': true,
+          'method.response.header.Access-Control-Allow-Headers': true,
+        },
+      }
       ],
     });
   }
