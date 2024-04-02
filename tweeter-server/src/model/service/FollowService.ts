@@ -1,4 +1,5 @@
 import { AuthToken, FakeData, User } from "tweeter-shared";
+import { Factory } from "../../dao/DAOInterfaces";
 
 export class FollowService {
 
@@ -8,13 +9,26 @@ export class FollowService {
     authToken: AuthToken,
     userToFollow: User
   ): Promise<[followersCount: number, followeesCount: number]> {
-    // Pause so we can see the following message. Remove when connected to the server
-    await new Promise((f) => setTimeout(f, 2000));
+    if (!AuthToken.isValid(authToken)) {
+      throw new Error("Invalid AuthToken");
+    }
+  
+    const authTokenTable = Factory.instance().createAuthTokenTableDAO();
+    const followsTable = Factory.instance().createFollowsTableDAO();
 
-    // TODO: Call the server
+    await authTokenTable.updateAuthToken(authToken);
 
-    let followersCount = await this.getFollowersCount(authToken, userToFollow);
-    let followeesCount = await this.getFolloweesCount(authToken, userToFollow);
+    const followerAlias = await authTokenTable.getAlias(authToken.token);
+    const followeeAlias = userToFollow.alias;
+    
+    if (followerAlias === null) {
+      throw new Error("Invalid AuthToken");
+    }
+
+    await followsTable.follow(followerAlias, followeeAlias);
+    
+    let followersCount = await followsTable.getFollowersCount(followeeAlias);
+    let followeesCount = await followsTable.getFolloweesCount(followeeAlias);
 
     return [followersCount, followeesCount];
   };
@@ -23,13 +37,25 @@ export class FollowService {
     authToken: AuthToken,
     userToUnfollow: User
   ): Promise<[followersCount: number, followeesCount: number]> {
-    // Pause so we can see the unfollowing message. Remove when connected to the server
-    await new Promise((f) => setTimeout(f, 2000));
+    if (!AuthToken.isValid(authToken)) {
+      throw new Error("Invalid AuthToken");
+    }
 
-    // TODO: Call the server
+    const authTokenTable = Factory.instance().createAuthTokenTableDAO();
+    const followsTable = Factory.instance().createFollowsTableDAO();
 
-    let followersCount = await this.getFollowersCount(authToken, userToUnfollow);
-    let followeesCount = await this.getFolloweesCount(authToken, userToUnfollow);
+    await authTokenTable.updateAuthToken(authToken);
+
+    const followerAlias = await authTokenTable.getAlias(authToken.token);
+    const followeeAlias = userToUnfollow.alias;
+
+    if (followerAlias === null) {
+      throw new Error("Invalid AuthToken");
+    }
+    await followsTable.unfollow(followerAlias, followeeAlias);
+
+    let followersCount = await followsTable.getFollowersCount(followeeAlias);
+    let followeesCount = await followsTable.getFolloweesCount(followeeAlias);
 
     return [followersCount, followeesCount];
   };
@@ -39,20 +65,112 @@ export class FollowService {
     user: User,
     selectedUser: User
   ): Promise<boolean> {
-    return FakeData.instance.isFollower();
+    if (!AuthToken.isValid(authToken)) {
+      throw new Error("Invalid AuthToken");
+    }
+
+    const authTokenTable = Factory.instance().createAuthTokenTableDAO();
+    const followsTable = Factory.instance().createFollowsTableDAO();
+
+    await authTokenTable.updateAuthToken(authToken);
+
+    const followerAlias = await authTokenTable.getAlias(authToken.token);
+    const followeeAlias = selectedUser.alias;
+
+    if (followerAlias === null) {
+      throw new Error("Invalid AuthToken");
+    }
+
+    return followsTable.getIsFollower(followerAlias, followeeAlias);
   };
 
   public async getFolloweesCount(
     authToken: AuthToken,
     user: User
   ): Promise<number> {
-    return FakeData.instance.getFolloweesCount(user);
+    if (!AuthToken.isValid(authToken)) {
+      throw new Error("Invalid AuthToken");
+    }
+
+    const authTokenTable = Factory.instance().createAuthTokenTableDAO();
+    const followsTable = Factory.instance().createFollowsTableDAO();
+
+    await authTokenTable.updateAuthToken(authToken);
+
+    return followsTable.getFolloweesCount(user.alias);
   };
 
   public async getFollowersCount(
     authToken: AuthToken,
     user: User
   ): Promise<number> {
-    return FakeData.instance.getFollowersCount(user);
+    if (!AuthToken.isValid(authToken)) {
+      throw new Error("Invalid AuthToken");
+    }
+
+    const authTokenTable = Factory.instance().createAuthTokenTableDAO();
+    const followsTable = Factory.instance().createFollowsTableDAO();
+
+    await authTokenTable.updateAuthToken(authToken);
+
+    return followsTable.getFollowersCount(user.alias);
+  };
+
+  public async loadMoreFollowers(
+    authToken: AuthToken,
+    user: User,
+    pageSize: number,
+    lastItem: User | null
+  ): Promise<[User[], boolean]> {
+    if (!AuthToken.isValid(authToken)) {
+      throw new Error("Invalid AuthToken");
+    }
+
+    const userTable = Factory.instance().createUserTableDAO();
+    const authTokenTable = Factory.instance().createAuthTokenTableDAO();
+    const followsTable = Factory.instance().createFollowsTableDAO();
+
+    await authTokenTable.updateAuthToken(authToken);
+
+    const followeeAlias = user.alias;
+    const [followerAliases, hasMore] = await followsTable.loadMoreFollowers(followeeAlias, lastItem?.alias ?? "");
+
+    let followers = []
+    for (let alias of followerAliases) {
+      let user = await userTable.getUser(alias);
+      if (user !== null) {
+        followers.push(user);
+      }
+    }
+    return [followers, hasMore];
+  };
+
+  public async loadMoreFollowees(
+    authToken: AuthToken,
+    user: User,
+    pageSize: number,
+    lastItem: User | null
+  ): Promise<[User[], boolean]> {
+    if (!AuthToken.isValid(authToken)) {
+      throw new Error("Invalid AuthToken");
+    }
+
+    const userTable = Factory.instance().createUserTableDAO();
+    const authTokenTable = Factory.instance().createAuthTokenTableDAO();
+    const followsTable = Factory.instance().createFollowsTableDAO();
+
+    await authTokenTable.updateAuthToken(authToken);
+
+    const followerAlias = user.alias;
+    const [followeeAliases, hasMore] = await followsTable.loadMoreFollowees(followerAlias, lastItem?.alias ?? "");
+
+    let followees = []
+    for (let alias of followeeAliases) {
+      let user = await userTable.getUser(alias);
+      if (user !== null) {
+        followees.push(user);
+      }
+    }
+    return [followees, hasMore];
   };
 }

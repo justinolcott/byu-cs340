@@ -24,7 +24,7 @@ export interface RegisterRequest extends TweeterRequest {
 }
 
 export interface GetUserRequest extends TweeterRequest {
-  authToken: AuthToken;
+  authToken: AuthTokenDto;
   alias: string;
 }
 
@@ -43,12 +43,12 @@ export interface LoadMoreStatusesRequest extends TweeterRequest {
 }
 
 export interface PostStatusRequest extends TweeterRequest {
-  authToken: AuthToken;
-  newStatus: Status;
+  authToken: AuthTokenDto;
+  newStatus: StatusDto;
 }
 
 export interface LogoutRequest extends TweeterRequest {
-  authToken: AuthToken;
+  authToken: AuthTokenDto;
 }
 
 export interface FollowRequest extends TweeterRequest {
@@ -89,7 +89,7 @@ export class TweeterRequestFactory {
     return { firstName, lastName, alias, password, userImageString };
   }
 
-  static createGetUserRequest(authToken: AuthToken, alias: string): GetUserRequest {
+  static createGetUserRequest(authToken: AuthTokenDto, alias: string): GetUserRequest {
     return { authToken, alias };
   }
 
@@ -101,11 +101,11 @@ export class TweeterRequestFactory {
     return { authToken, user, pageSize, lastItem };
   }
 
-  static createPostStatusRequest(authToken: AuthToken, newStatus: Status): PostStatusRequest {
+  static createPostStatusRequest(authToken: AuthTokenDto, newStatus: StatusDto): PostStatusRequest {
     return { authToken, newStatus};
   }
 
-  static createLogoutRequest(authToken: AuthToken): LogoutRequest {
+  static createLogoutRequest(authToken: AuthTokenDto): LogoutRequest {
     return { authToken };
   }
 

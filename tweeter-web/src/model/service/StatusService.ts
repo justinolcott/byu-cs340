@@ -73,7 +73,7 @@ export class StatusService {
 
     // TODO: Call the server to post the status
     const response = await this.server.postStatus(
-      TweeterRequestFactory.createPostStatusRequest(authToken, newStatus)
+      TweeterRequestFactory.createPostStatusRequest(authToken.dto, newStatus.dto)
     );
     if (!response.success) {
       throw new Error("Invalid status in postStatus");

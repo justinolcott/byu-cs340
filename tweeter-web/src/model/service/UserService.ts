@@ -42,7 +42,7 @@ export class UserService {
     // Pause so we can see the logging out message. Delete when the call to the server is implemented.
     await new Promise((res) => setTimeout(res, 1000));
     const response = await this.server.logout(
-      TweeterRequestFactory.createLogoutRequest(authToken)
+      TweeterRequestFactory.createLogoutRequest(authToken.dto)
     );
     if (!response.success) {
       throw new Error("Invalid logout");
@@ -93,7 +93,7 @@ export class UserService {
 
   public async getUser(authToken: AuthToken, alias: string): Promise<User | null> {
     const response = await this.server.getUser(
-      TweeterRequestFactory.createGetUserRequest(authToken, alias)
+      TweeterRequestFactory.createGetUserRequest(authToken.dto, alias)
     );
     const user = User.fromDto(response.user);
     if (user === null) {

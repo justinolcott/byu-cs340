@@ -26,6 +26,13 @@ export class AuthToken {
     }
   }
 
+  public static isValid(token: AuthToken): boolean {
+    // check if the timestamp was made in the last 4 hours
+    let currentTime = Date.now();
+    let fourHours = 4 * 60 * 60 * 1000;
+    return currentTime - token.timestamp < fourHours;
+  }
+
   public constructor(token: string, timestamp: number) {
     this._token = token;
     this._timestamp = timestamp;

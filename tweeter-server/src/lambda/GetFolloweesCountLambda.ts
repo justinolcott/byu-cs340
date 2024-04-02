@@ -4,9 +4,11 @@ import { AuthToken, User } from "tweeter-shared";
 
 export const handler = async (event: GetFolloweesCountRequest): Promise<GetFolloweesCountResponse> => {
   try {
+    const update = Date.now();
     let followeesCount = await new FollowService().getFolloweesCount(
       AuthToken.fromDto(event.authToken)!,
       User.fromDto(event.user)!);
+
     return TweeterResponseFactory.createGetFolloweesCountResponse(true, followeesCount);
   }
   catch (e) {

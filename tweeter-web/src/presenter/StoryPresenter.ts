@@ -8,6 +8,6 @@ export class StoryPresenter extends StatusItemPresenter {
   }
 
   protected async getMoreItems(authToken: AuthToken, user: User): Promise<[any[], boolean]> {
-    return this.service.loadMoreFeedItems(authToken, user, PAGE_SIZE, this.lastItem);
+    return this.service.loadMoreStoryItems(authToken, user, PAGE_SIZE, this.lastItem);
   }
 }

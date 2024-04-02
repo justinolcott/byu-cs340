@@ -4,10 +4,12 @@ import { AuthToken, User } from "tweeter-shared";
 
 export const handler = async (event: GetIsFollowerStatusRequest): Promise<GetIsFollowerStatusResponse> => {
   try {
+    const update = Date.now();
     let isFollower = await new FollowService().getIsFollowerStatus(
       AuthToken.fromDto(event.authToken)!,
       User.fromDto(event.user)!,
       User.fromDto(event.selectedUser)!);
+
     return TweeterResponseFactory.createGetIsFollowerStatusResponse(true, isFollower);
   }
   catch (e) {

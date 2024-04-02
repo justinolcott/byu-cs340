@@ -1,20 +1,38 @@
 import { Buffer } from "buffer";
 import { User, AuthToken, FakeData } from "tweeter-shared";
+import { Factory } from "../../dao/DAOInterfaces";
+// import { compareSync, hashSync } from "bcrypt";
+import { compareSync, hashSync } from "bcryptjs";
 
 
 export class UserService {
   public async login(alias: string, password: string): Promise<[User, AuthToken]> {
-      // TODO: Replace with the result of calling the server
-      let user = FakeData.instance.firstUser;
+      const storedHash = await Factory.instance().createUserTableDAO().getHash(alias);
+      if (storedHash === null) {
+        throw new Error("Invalid alias or password");
+      }
+
+      const isValid = await compareSync(password, storedHash);
+      if (!isValid) {
+        throw new Error("Invalid alias or password");
+      }
+
+      let user = await Factory.instance().createUserTableDAO().getUser(alias);
       if (user === null) {
         throw new Error("Invalid alias or password");
       }
-      return [user, FakeData.instance.authToken];
+
+      const authToken = AuthToken.Generate();
+      const success = await Factory.instance().createAuthTokenTableDAO().putAuthToken(authToken, alias);
+      if (!success) {
+        throw new Error("Error with AuthToken.");
+      }
+
+      return [user, authToken];
   };
 
   public async logout(authToken: AuthToken): Promise<void> {
-    // Pause so we can see the logging out message. Delete when the call to the server is implemented.
-    await new Promise((res) => setTimeout(res, 1000));
+    await Factory.instance().createAuthTokenTableDAO().deleteAuthToken(authToken.token);
   };
 
   public async register(
@@ -24,38 +42,48 @@ export class UserService {
     password: string,
     userImageString: string
   ): Promise<[User, AuthToken]> {
-    // Not neded now, but will be needed when you make the request to the server in milestone 3
+    const url = await Factory.instance().createProfileImageDAO().putImage(alias, userImageString);
+    const user = new User(
+      firstName,
+      lastName,
+      alias,
+      url
+    );
+    const hash:string = await hashSync(password, 10);
 
-    // TODO: Replace with the result of calling the server
-    let user = FakeData.instance.firstUser;
+    // Does the alias already exist?
+    const existingUser = await Factory.instance().createUserTableDAO().getUser(alias);
+    if (existingUser !== null) {
+      throw new Error("Alias already exists");
+    }
+
+    Factory.instance().createUserTableDAO().putUser(
+      user,
+      hash,
+      // 0,
+      // 0
+    );
+
     if (user === null) {
       throw new Error("Invalid registration");
     }
-    return [user, FakeData.instance.authToken];
+
+    const authToken = AuthToken.Generate();
+    const success = await Factory.instance().createAuthTokenTableDAO().putAuthToken(authToken, alias);
+    if (!success) {
+      throw new Error("Error with AuthToken.");
+    }
+    
+    return [user, authToken];
   };
+
 
   public async getUser(authToken: AuthToken, alias: string): Promise<User | null> {
-    return FakeData.instance.findUserByAlias(alias);
-  };
+    if (!AuthToken.isValid(authToken)) {
+      throw new Error("Invalid AuthToken");
+    }
 
-  public async loadMoreFollowers(
-    authToken: AuthToken,
-    user: User,
-    pageSize: number,
-    lastItem: User | null
-  ): Promise<[User[], boolean]> {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.getPageOfUsers(lastItem, pageSize, user);
+    await Factory.instance().createAuthTokenTableDAO().updateAuthToken(authToken);
+    return await Factory.instance().createUserTableDAO().getUser(alias);
   };
-
-  public async loadMoreFollowees(
-    authToken: AuthToken,
-    user: User,
-    pageSize: number,
-    lastItem: User | null
-  ): Promise<[User[], boolean]> {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.getPageOfUsers(lastItem, pageSize, user);
-  };
-  
 }

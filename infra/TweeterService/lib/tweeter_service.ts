@@ -3,8 +3,11 @@ import { Construct } from "constructs";
 import * as apigateway from "aws-cdk-lib/aws-apigateway";
 import * as lambda from "aws-cdk-lib/aws-lambda";
 import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
+import * as s3 from "aws-cdk-lib/aws-s3";
 // import * as cloudwatch from 'aws-cdk-lib/aws-cloudwatch';
 import path = require("path");
+import * as iam from 'aws-cdk-lib/aws-iam';
+import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
 
 // const lambda_dir = "../../tweeter-server/dist/lambda";
 const lambda_dir = "../../tweeter-server/src/lambda/";
@@ -138,6 +141,9 @@ export class TweeterService extends Construct {
       runtime: lambda.Runtime.NODEJS_20_X,
       entry: lambda_dir + "RegisterLambda.ts",
       handler: "handler",
+      // increase timeout
+      timeout: cdk.Duration.seconds(60),
+
     });
 
     const register = service.addResource("register", {
@@ -1145,5 +1151,155 @@ export class TweeterService extends Construct {
       }
       ],
     });
+
+    const userProfileImagesBucket = new cdk.aws_s3.Bucket(this, "ImagesBucket340", {
+      bucketName: "tweeter-user-profile-images-bucket-cs340-v1",
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      publicReadAccess: true,
+      // objectOwnership: s3.ObjectOwnership.OBJECT_WRITER,
+      // accessControl: s3.BucketAccessControl.PUBLIC_READ,
+      blockPublicAccess: {
+        blockPublicAcls: false,
+        blockPublicPolicy: false,
+        ignorePublicAcls: false,
+        restrictPublicBuckets: false,
+      },
+    });
+
+    
+
+    // userProfileImagesBucket.grantReadWrite(registerLambda);
+    // Give the Lambda access to put objects in the s3 bucket
+    userProfileImagesBucket.grantReadWrite(registerLambda);
+    userProfileImagesBucket.grantPublicAccess();
+    userProfileImagesBucket.grantPut(registerLambda);
+    userProfileImagesBucket.grantPutAcl(registerLambda);
+
+
+    const userTable = new dynamodb.TableV2(this, "UserTable", {
+      partitionKey: { name: "alias", type: dynamodb.AttributeType.STRING },
+      tableName: "UserTable",
+      billing: dynamodb.Billing.provisioned(
+        {
+          readCapacity: dynamodb.Capacity.fixed(1),
+          writeCapacity: dynamodb.Capacity.autoscaled({ maxCapacity: 1 }),
+        }
+      ),
+    });
+
+    const feedTable = new dynamodb.TableV2(this, "FeedTable", {
+      partitionKey: { name: "receiverAlias", type: dynamodb.AttributeType.STRING },
+      sortKey: { name: "timestamp", type: dynamodb.AttributeType.NUMBER },
+      tableName: "FeedTable",
+      billing: dynamodb.Billing.provisioned(
+        {
+          readCapacity: dynamodb.Capacity.fixed(1),
+          writeCapacity: dynamodb.Capacity.autoscaled({ maxCapacity: 1 }),
+        }
+      )
+    });
+
+    const storyTable = new dynamodb.TableV2(this, "StoryTable", {
+      partitionKey: { name: "senderAlias", type: dynamodb.AttributeType.STRING },
+      sortKey: { name: "timestamp", type: dynamodb.AttributeType.NUMBER },
+      tableName: "StoryTable",
+      billing: dynamodb.Billing.provisioned(
+        {
+          readCapacity: dynamodb.Capacity.fixed(1),
+          writeCapacity: dynamodb.Capacity.autoscaled({ maxCapacity: 1 }),
+        }
+      )
+    });
+
+   
+
+    /*
+Create a table named “follows”.
+Partition Key: a string named “follower_handle”. This attribute stores the Twitter handle of the user who is following another user.
+Sort Key: a string named “followee_handle”. This attribute stores the Twitter handle of the user who is being followed.
+This Primary Key lets you query the table by “follower_handle” and sort the results by “followee_handle”.
+Under 'Table Settings' click 'Customize settings'.
+Adjust read & write capacities by turning autoscaling off for each and entering in the desired provisioned capacity units.  These control how fast Dynamo can read/write data to/from your table (you may need to re-adjust these for the project).
+Under 'Secondary indexes' click 'create global index'.
+Index Partition Key: a string named “followee_handle. This is the same “followee_handle” attribute you created in the previous step.
+Index Sort Key: a string named “follower_handle”. This is the same “follower_handle” attribute you created in the previous step.
+This Primary Key lets you query the index by “followee_handle” and sort the results by “follower_handle”.
+Set the index name to “follows_index”.
+For “Projected attributes”, keep the “All” setting.
+Click 'Create table' at the bottom of the page.
+    */
+
+    const followsTable = new dynamodb.TableV2(this, "FollowersTable", {
+      partitionKey: { name: "followerAlias", type: dynamodb.AttributeType.STRING },
+      sortKey: { name: "followeeAlias", type: dynamodb.AttributeType.STRING },
+      tableName: "FollowersTable",
+      globalSecondaryIndexes: [
+        {
+          indexName: "FollowsIndex",
+          partitionKey: { name: "followeeAlias", type: dynamodb.AttributeType.STRING },
+          sortKey: { name: "followerAlias", type: dynamodb.AttributeType.STRING },
+        },
+      ],
+      billing: dynamodb.Billing.provisioned(
+        {
+          readCapacity: dynamodb.Capacity.fixed(1),
+          writeCapacity: dynamodb.Capacity.autoscaled({ maxCapacity: 1 }),
+        }
+      )
+    });
+
+    const authTokenTable = new dynamodb.TableV2(this, "AuthTokenTable", {
+      partitionKey: { name: "token", type: dynamodb.AttributeType.STRING },
+      tableName: "AuthTokenTable",
+      billing: dynamodb.Billing.provisioned(
+        {
+          readCapacity: dynamodb.Capacity.fixed(1),
+          writeCapacity: dynamodb.Capacity.autoscaled({ maxCapacity: 1 }),
+        }
+      )
+    });
+
+   // "errorMessage": "400: AccessDeniedException: User: arn:aws:sts::691482752617:assumed-role/TweeterServiceStack-TweeterServiceGetFollowersCount-AyN4Z5pX8AUK/TweeterServiceStack-TweeterServiceGetFollowersCoun-1wfI1Snr71Er is not authorized to perform: dynamodb:Query on resource: arn:aws:dynamodb:us-east-1:691482752617:table/FollowersTable/index/FollowsIndex because no identity-based policy allows the dynamodb:Query action",
+
+    const policy = new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: ["dynamodb:PutItem",
+                "dynamodb:GetItem",
+                "dynamodb:Query",
+                "dynamodb:Scan",
+                "dynamodb:UpdateItem",
+                "dynamodb:DeleteItem",
+                "dynamodb:BatchGetItem",
+                "dynamodb:BatchWriteItem",
+                "dynamodb:DescribeTable",
+                "dynamodb:GetRecords",
+                "s3:PutObject"],
+      resources: [userTable.tableArn,
+                  feedTable.tableArn,
+                  storyTable.tableArn,
+                  followsTable.tableArn,
+                  `${followsTable.tableArn}/index/FollowsIndex`,
+                  authTokenTable.tableArn,
+                  userProfileImagesBucket.bucketArn],
+    });
+
+    loginLambda.addToRolePolicy(policy);
+    registerLambda.addToRolePolicy(policy);
+    getUserLambda.addToRolePolicy(policy);
+    loadMoreFollowersLambda.addToRolePolicy(policy);
+    loadMoreFolloweesLambda.addToRolePolicy(policy);
+    loadMoreFeedItemsLambda.addToRolePolicy(policy);
+    loadMoreStoryItemsLambda.addToRolePolicy(policy);
+    postStatusLambda.addToRolePolicy(policy);
+    logoutLambda.addToRolePolicy(policy);
+    followLambda.addToRolePolicy(policy);
+    unfollowLambda.addToRolePolicy(policy);
+    getIsFollowerStatusLambda.addToRolePolicy(policy);
+    getFollowersCountLambda.addToRolePolicy(policy);
+    getFolloweesCountLambda.addToRolePolicy(policy);
+
+
+
+    
   }
 }

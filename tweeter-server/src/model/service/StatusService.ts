@@ -1,4 +1,5 @@
 import { AuthToken, User, Status, FakeData } from "tweeter-shared";
+import { Factory } from "../../dao/DAOInterfaces";
 
 export class StatusService {
   public async loadMoreStoryItems(
@@ -7,8 +8,7 @@ export class StatusService {
     pageSize: number,
     lastItem: Status | null
     ): Promise<[Status[], boolean]> {
-      // TODO: Replace with the result of calling server
-      return FakeData.instance.getPageOfStatuses(lastItem, pageSize);
+      return await Factory.instance().createStoryTableDAO().loadMoreStories(user.alias, lastItem);
   };
   
   public async loadMoreFeedItems(
@@ -30,9 +30,13 @@ export class StatusService {
     authToken: AuthToken,
     newStatus: Status
   ): Promise<void> {
-    // Pause so we can see the logging out message. Remove when connected to the server
-    await new Promise((f) => setTimeout(f, 2000));
+    // Check authtoken
+    // console.log("AuthToken", authToken);
+    if (!AuthToken.isValid(authToken)) {
+      throw new Error("Invalid AuthToken");
+    }
 
-    // TODO: Call the server to post the status
+    newStatus.timestamp = new Date().getTime();
+    await Factory.instance().createStoryTableDAO().putStory(newStatus);
   };
 }

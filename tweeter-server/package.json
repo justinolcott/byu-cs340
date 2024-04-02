@@ -10,6 +10,16 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.540.0",
+    "@aws-sdk/client-s3": "^3.540.0",
+    "@aws-sdk/lib-dynamodb": "^3.540.0",
+    "bcrypt": "^5.1.1",
+    "bcrypt-ts": "^5.0.2",
+    "bcryptjs": "^2.4.3",
     "tweeter-shared": "file:../tweeter-shared"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/bcryptjs": "^2.4.6"
   }
 }
