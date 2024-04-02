@@ -23,10 +23,24 @@ export class StatusService {
           letItemDto
         )
       );
-
-      let statuses = responses.statuses.map((status) => Status.fromDto(status));
-      if (statuses.includes(null)) {
-        throw new Error("Invalid status in loadMoreStoryItems");
+      
+      console.log("status responses: ", responses.statuses);
+   
+      let statuses: Status[] = [];
+      for (let i = 0; i < responses.statuses.length; i++) {
+        console
+        let user = new User(
+          responses.statuses[i].user.firstName,
+          responses.statuses[i].user.lastName,
+          responses.statuses[i].user.alias,
+          responses.statuses[i].user.imageUrl
+        )
+        let status = new Status(
+          responses.statuses[i].post,
+          user,
+          responses.statuses[i].timestamp
+        );
+        statuses.push(status);
       }
 
       return [statuses, responses.hasMorePages] as [Status[], boolean];

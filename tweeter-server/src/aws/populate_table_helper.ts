@@ -6,6 +6,9 @@ import { UserTableAWSDAO } from "./dynamo/UserTableAWSDAO";
 import { ProfileImageAWSDAO } from "./s3/ProfileImageAWSDAO";
 import { StoryTableAWSDAO } from "./dynamo/StoryTableAWSDAO";
 import { StatusService } from "../model/service/StatusService";
+import { FollowService } from "../model/service/FollowService";
+import { AuthTokenAWSDAO } from "./dynamo/AuthTokenTableAWSDAO";
+import { FollowsTableAWSDAO } from "./dynamo/FollowsTableAWSDAO";
 
 
 // // Clear UserTable
@@ -49,27 +52,39 @@ async function RegisterAllUsers() {
   }
 }
 
+async function AllFollows() {
+  const followTableDao = new FollowsTableAWSDAO();
+  const allUsers = FakeData.instance.fakeUsers;
+
+  // I follow all of them
+  for (const user of allUsers) {
+    console.log(`Putting follow ${user.alias}`);
+    await followTableDao.follow("asdf", user.alias);
+  }
+
+  // they all follow me
+  for (const user of allUsers) {
+    console.log(`Putting follow ${user.alias}`);
+    await followTableDao.follow(user.alias, "asdf");
+  }
+}
 
 async function CreateAllStories() {
-
   const validAuthToken = new AuthToken("valid", Date.now());
   const statusService = new StatusService();
 
   const allStatuses = FakeData.instance.fakeStatuses;
-
   for (const status of allStatuses) {
     console.log(`Putting status `, status);
     await statusService.postStatus(validAuthToken, status);
   }
-
-  
-
 }
 
 
 
 async function test() {
   // await RegisterAllUsers();
+  await AllFollows();
   await CreateAllStories();
   return;
 }

@@ -30,7 +30,6 @@ import { StoryTableDAO } from "../../dao/DAOInterfaces";
 
 export class StoryTableAWSDAO implements StoryTableDAO {
   readonly tableName: string = "StoryTable";
-  readonly pageSize: number = 10;
 
   async putStory(status: Status): Promise<void> {
     const client = DynamoDBDocumentClient.from(
@@ -46,7 +45,7 @@ export class StoryTableAWSDAO implements StoryTableDAO {
         Item: {
           senderAlias: status.user.alias,
           timestamp: status.timestamp,
-          status: status,
+          status: status.dto,
         }
 
       })
@@ -82,7 +81,7 @@ export class StoryTableAWSDAO implements StoryTableDAO {
     );
   }
 
-  async loadMoreStories(senderAlias: string, lastStatus: Status | null): Promise<[Status[], boolean]> {
+  async loadMoreStories(senderAlias: string, lastStatus: Status | null, pageSize: number): Promise<[Status[], boolean]> {
     const client = DynamoDBDocumentClient.from(new DynamoDBClient());
     
     const result = await client.send(
@@ -99,15 +98,19 @@ export class StoryTableAWSDAO implements StoryTableDAO {
           senderAlias: senderAlias,
           timestamp: lastStatus.timestamp,
         },
-        Limit: this.pageSize,
+        Limit: pageSize,
       })
     );
 
+    console.log("result", result.Items);
+
     const statuses = result.Items?.map((item) => new Status(
-      item.status.text,
-      item.status.timestamp,
-      item.status.user
+      item.status.post,
+      item.status.user,
+      item.status.timestamp
     ));
+
+    console.log("statuses", statuses);
     const hasMore = !!result.LastEvaluatedKey;
 
     return [statuses ?? [], hasMore];

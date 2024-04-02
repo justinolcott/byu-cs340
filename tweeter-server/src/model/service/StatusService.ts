@@ -8,7 +8,10 @@ export class StatusService {
     pageSize: number,
     lastItem: Status | null
     ): Promise<[Status[], boolean]> {
-      return await Factory.instance().createStoryTableDAO().loadMoreStories(user.alias, lastItem);
+      if (!AuthToken.isValid(authToken)) {
+        throw new Error("Invalid AuthToken");
+      }
+      return await Factory.instance().createStoryTableDAO().loadMoreStories(user.alias, lastItem, pageSize);
   };
   
   public async loadMoreFeedItems(
@@ -17,26 +20,33 @@ export class StatusService {
     pageSize: number,
     lastItem: Status | null
     ): Promise<[Status[], boolean]> {
-      // TODO: Replace with the result of calling server
-      // console.log("starting loadMoreFeedItems");
-      // console.log("lastItem", lastItem);
-      // console.log("user", lastItem?.user);
-      const [statuses, hasMore] = FakeData.instance.getPageOfStatuses(lastItem, pageSize);
-      // console.log("finishing loadMoreFeedItems", statuses);
-      return [statuses, hasMore];
+      if (!AuthToken.isValid(authToken)) {
+        throw new Error("Invalid AuthToken");
+      }
+      return await Factory.instance().createFeedTableDAO().loadMoreFeedItems(user.alias, lastItem, pageSize);
   };
 
   public async postStatus(
     authToken: AuthToken,
     newStatus: Status
   ): Promise<void> {
-    // Check authtoken
-    // console.log("AuthToken", authToken);
     if (!AuthToken.isValid(authToken)) {
       throw new Error("Invalid AuthToken");
     }
 
+    const followsTableDAO = Factory.instance().createFollowsTableDAO();
+    const feedTableDAO = Factory.instance().createFeedTableDAO();
+    const StoryTableDAO = Factory.instance().createStoryTableDAO();
+
+    const followers = await followsTableDAO.getFollowers(newStatus.user.alias);
+    // followers.push(newStatus.user.alias);
+    const followee = newStatus.user.alias;
+
+    for (const follower of followers) {
+      await feedTableDAO.putStatus(newStatus, followee, follower);
+    }
+
     newStatus.timestamp = new Date().getTime();
-    await Factory.instance().createStoryTableDAO().putStory(newStatus);
+    await StoryTableDAO.putStory(newStatus);
   };
 }

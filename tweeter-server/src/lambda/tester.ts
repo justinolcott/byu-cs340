@@ -1,4 +1,4 @@
-import { handler } from './RegisterLambda';
+import { handler } from './LoadMoreStoryItemsLambda';
 import fs from 'fs';
 
 // Read the contents of payload.json

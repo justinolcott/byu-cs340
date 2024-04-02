@@ -1,5 +1,6 @@
 import { AuthTokenTableDAO, DAOFactory, FeedTableDAO, FollowsTableDAO, ProfileImageDAO, StoryTableDAO, UserTableDAO } from "../dao/DAOInterfaces";
 import { AuthTokenAWSDAO } from "./dynamo/AuthTokenTableAWSDAO";
+import { FeedTableAWSDAO } from "./dynamo/FeedTableAWSDAO";
 import { FollowsTableAWSDAO } from "./dynamo/FollowsTableAWSDAO";
 import { StoryTableAWSDAO } from "./dynamo/StoryTableAWSDAO";
 import { UserTableAWSDAO } from "./dynamo/UserTableAWSDAO";
@@ -16,7 +17,7 @@ export class FactoryAWSDAO implements DAOFactory {
   }
 
   createFeedTableDAO(): FeedTableDAO {
-    throw new Error("Method not implemented.");
+    return new FeedTableAWSDAO();
   }
 
   createAuthTokenTableDAO(): AuthTokenTableDAO {

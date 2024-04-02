@@ -31,13 +31,14 @@ export interface UserTableDAO {
 }
 
 export interface FeedTableDAO {
-
+  putStatus(status: Status, senderAlias: string, receiverAlias: string): Promise<void>;
+  loadMoreFeedItems(receiverAlias: string, lastStatus: Status | null, pageSize: number): Promise<[Status[], boolean]>;
 }
 
 export interface StoryTableDAO {
   putStory(status: Status): Promise<void>;
   deleteStory(senderAlias: string): Promise<void>;
-  loadMoreStories(senderAlias: string, lastStatus: Status | null): Promise<[Status[], boolean]>;
+  loadMoreStories(senderAlias: string, lastStatus: Status | null, pageSize: number): Promise<[Status[], boolean]>;
 }
 
 export interface AuthTokenTableDAO {
