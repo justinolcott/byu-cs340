@@ -91,12 +91,8 @@ export class FollowService {
     if (!AuthToken.isValid(authToken)) {
       throw new Error("Invalid AuthToken");
     }
-
-    const authTokenTable = Factory.instance().createAuthTokenTableDAO();
+    Factory.instance().createAuthTokenTableDAO().updateAuthToken(authToken);
     const followsTable = Factory.instance().createFollowsTableDAO();
-
-    await authTokenTable.updateAuthToken(authToken);
-
     return followsTable.getFolloweesCount(user.alias);
   };
 
@@ -107,11 +103,9 @@ export class FollowService {
     if (!AuthToken.isValid(authToken)) {
       throw new Error("Invalid AuthToken");
     }
+    Factory.instance().createAuthTokenTableDAO().updateAuthToken(authToken);
 
-    const authTokenTable = Factory.instance().createAuthTokenTableDAO();
     const followsTable = Factory.instance().createFollowsTableDAO();
-
-    await authTokenTable.updateAuthToken(authToken);
 
     return followsTable.getFollowersCount(user.alias);
   };
@@ -125,12 +119,10 @@ export class FollowService {
     if (!AuthToken.isValid(authToken)) {
       throw new Error("Invalid AuthToken");
     }
+    Factory.instance().createAuthTokenTableDAO().updateAuthToken(authToken);
 
     const userTable = Factory.instance().createUserTableDAO();
-    const authTokenTable = Factory.instance().createAuthTokenTableDAO();
     const followsTable = Factory.instance().createFollowsTableDAO();
-
-    await authTokenTable.updateAuthToken(authToken);
 
     const followeeAlias = user.alias;
     const [followerAliases, hasMore] = await followsTable.loadMoreFollowers(followeeAlias, lastItem?.alias ?? "");
@@ -154,12 +146,10 @@ export class FollowService {
     if (!AuthToken.isValid(authToken)) {
       throw new Error("Invalid AuthToken");
     }
+    Factory.instance().createAuthTokenTableDAO().updateAuthToken(authToken);
 
     const userTable = Factory.instance().createUserTableDAO();
-    const authTokenTable = Factory.instance().createAuthTokenTableDAO();
     const followsTable = Factory.instance().createFollowsTableDAO();
-
-    await authTokenTable.updateAuthToken(authToken);
 
     const followerAlias = user.alias;
     const [followeeAliases, hasMore] = await followsTable.loadMoreFollowees(followerAlias, lastItem?.alias ?? "");

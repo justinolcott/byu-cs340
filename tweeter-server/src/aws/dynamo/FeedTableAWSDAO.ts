@@ -62,6 +62,7 @@ export class FeedTableAWSDAO implements FeedTableDAO {
           receiverAlias: receiverAlias,
           timestamp: lastStatus.timestamp
         },
+        ScanIndexForward: false,
         Limit: pageSize
       })
     );

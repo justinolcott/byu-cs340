@@ -11,6 +11,7 @@ export class StatusService {
       if (!AuthToken.isValid(authToken)) {
         throw new Error("Invalid AuthToken");
       }
+      Factory.instance().createAuthTokenTableDAO().updateAuthToken(authToken);
       return await Factory.instance().createStoryTableDAO().loadMoreStories(user.alias, lastItem, pageSize);
   };
   
@@ -23,6 +24,7 @@ export class StatusService {
       if (!AuthToken.isValid(authToken)) {
         throw new Error("Invalid AuthToken");
       }
+      Factory.instance().createAuthTokenTableDAO().updateAuthToken(authToken);
       return await Factory.instance().createFeedTableDAO().loadMoreFeedItems(user.alias, lastItem, pageSize);
   };
 
@@ -33,13 +35,13 @@ export class StatusService {
     if (!AuthToken.isValid(authToken)) {
       throw new Error("Invalid AuthToken");
     }
+    Factory.instance().createAuthTokenTableDAO().updateAuthToken(authToken);
 
     const followsTableDAO = Factory.instance().createFollowsTableDAO();
     const feedTableDAO = Factory.instance().createFeedTableDAO();
     const StoryTableDAO = Factory.instance().createStoryTableDAO();
 
     const followers = await followsTableDAO.getFollowers(newStatus.user.alias);
-    // followers.push(newStatus.user.alias);
     const followee = newStatus.user.alias;
 
     for (const follower of followers) {

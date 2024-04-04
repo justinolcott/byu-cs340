@@ -143,7 +143,6 @@ export class TweeterService extends Construct {
       handler: "handler",
       // increase timeout
       timeout: cdk.Duration.seconds(60),
-
     });
 
     const register = service.addResource("register", {
@@ -612,6 +611,7 @@ export class TweeterService extends Construct {
       runtime: lambda.Runtime.NODEJS_20_X,
       entry: lambda_dir + "PostStatusLambda.ts",
       handler: "handler",
+      timeout: cdk.Duration.seconds(60),
     });
 
     const postStatus = service.addResource("postStatus", {

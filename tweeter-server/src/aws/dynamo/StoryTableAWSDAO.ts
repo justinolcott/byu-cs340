@@ -99,6 +99,7 @@ export class StoryTableAWSDAO implements StoryTableDAO {
           timestamp: lastStatus.timestamp,
         },
         Limit: pageSize,
+        ScanIndexForward: false,
       })
     );
 
