@@ -18,6 +18,7 @@ import {
   PutCommand,
   QueryCommand,
   UpdateCommand,
+  BatchWriteCommand,
 } from "@aws-sdk/lib-dynamodb";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { Status } from "tweeter-shared";
@@ -44,6 +45,52 @@ export class FeedTableAWSDAO implements FeedTableDAO {
         }
       })
     );
+  }
+
+  async putBatchStatus(status: Status, senderAlias: string, receiverAliases: string[]): Promise<void> {
+    const client = DynamoDBDocumentClient.from(
+      new DynamoDBClient(), {
+        marshallOptions: {
+          convertClassInstanceToMap: true,
+        }
+      }
+    );
+
+    const putRequests = receiverAliases.map((receiverAlias) => ({
+      PutRequest: {
+        Item: {
+          receiverAlias: receiverAlias,
+          timestamp: status.timestamp,
+          status: status.dto,
+          senderAlias: senderAlias
+        }
+      }
+    }));
+
+    console.log("putRequests: ", putRequests)
+
+    // send batch write request for every 25 items even if the number of items is less than 25
+    try {
+      for (let i = 0; i < putRequests.length; i += 25) {
+        await client.send(
+          new BatchWriteCommand({
+            RequestItems: {
+              [this.tableName]: putRequests.slice(i, i + 25)
+            }
+          })
+        );
+      }
+    } catch (e) {
+      console.log("Error in batch write: ", e)
+    }
+
+    // await client.send(
+    //   new BatchWriteCommand({
+    //     RequestItems: {
+    //       [this.tableName]: putRequests
+    //     }
+    //   })
+    // );   
   }
 
   async loadMoreFeedItems(receiverAlias: string, lastStatus: Status | null, pageSize: number): Promise<[Status[], boolean]> {

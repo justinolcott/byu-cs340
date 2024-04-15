@@ -42,10 +42,7 @@ export interface LoadMoreStatusesRequest extends TweeterRequest {
   lastItem: StatusDto | null;
 }
 
-export interface PostStatusRequest extends TweeterRequest {
-  authToken: AuthTokenDto;
-  newStatus: StatusDto;
-}
+
 
 export interface LogoutRequest extends TweeterRequest {
   authToken: AuthTokenDto;
@@ -76,7 +73,21 @@ export interface GetFollowersCountRequest extends TweeterRequest {
   authToken: AuthTokenDto;
   user: UserDto;
 }
+// unused
+export interface PostUpdateFeedMessagesRequest extends TweeterRequest {
+  newStatus: StatusDto;
+}
 
+// unused
+export interface UpdateFeedsRequest extends TweeterRequest {
+  newStatus: StatusDto;
+  followers: UserDto[];
+}
+
+export interface PostStatusRequest extends TweeterRequest {
+  authToken: AuthTokenDto;
+  newStatus: StatusDto;
+}
 
 
 
@@ -127,6 +138,14 @@ export class TweeterRequestFactory {
 
   static createGetFollowersCountRequest(authToken: AuthTokenDto, user: UserDto): GetFollowersCountRequest {
     return { authToken, user };
+  }
+
+  static createPostUpdateFeedMessagesRequest(newStatus: StatusDto): PostUpdateFeedMessagesRequest {
+    return { newStatus };
+  }
+
+  static createUpdateFeedsRequest(newStatus: StatusDto, followers: UserDto[]): UpdateFeedsRequest {
+    return { newStatus, followers };
   }
 }
 

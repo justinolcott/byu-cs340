@@ -46,5 +46,9 @@ export type { GetFolloweesCountResponse } from "./model/net/Response";
 export type { GetFollowersCountRequest } from "./model/net/Request";
 export type { GetFollowersCountResponse } from "./model/net/Response";
 
+export type { PostUpdateFeedMessagesRequest } from "./model/net/Request";
+export type { PostUpdateFeedMessagesResponse } from "./model/net/Response";
+
 export { TweeterRequestFactory } from "./model/net/Request";
 export { TweeterResponseFactory } from "./model/net/Response";
+

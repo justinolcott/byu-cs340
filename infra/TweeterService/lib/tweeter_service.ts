@@ -8,6 +8,8 @@ import * as s3 from "aws-cdk-lib/aws-s3";
 import path = require("path");
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
+import * as sqs from "aws-cdk-lib/aws-sqs";
+import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
 
 // const lambda_dir = "../../tweeter-server/dist/lambda";
 const lambda_dir = "../../tweeter-server/src/lambda/";
@@ -45,6 +47,7 @@ export class TweeterService extends Construct {
       runtime: lambda.Runtime.NODEJS_20_X,
       entry: lambda_dir + "LoginLambda.ts",
       handler: "handler",
+      timeout: cdk.Duration.seconds(60),
     });
 
     const login = service.addResource("login", {
@@ -1152,6 +1155,160 @@ export class TweeterService extends Construct {
       ],
     });
 
+    // PostUpdateFeedMessagesLambda
+    const postUpdateFeedMessagesLambda = new NodejsFunction(this, "PostUpdateFeedMessagesHandler", {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      entry: lambda_dir + "PostUpdateFeedMessagesLambda.ts",
+      handler: "handler",
+      timeout: cdk.Duration.seconds(180),
+    });
+
+    const postUpdateFeedMessages = service.addResource("postUpdateFeedMessages", {
+      defaultCorsPreflightOptions: {
+        allowOrigins: apigateway.Cors.ALL_ORIGINS,
+        allowMethods: apigateway.Cors.ALL_METHODS,
+      },
+    });
+
+    const postUpdateFeedMessagesIntegration = new apigateway.LambdaIntegration(postUpdateFeedMessagesLambda, {
+      proxy: false,
+      integrationResponses: [
+        {
+          statusCode: "200",
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': "'*'",
+            'method.response.header.Access-Control-Allow-Methods': "'*'",
+            'method.response.header.Access-Control-Allow-Headers': "'*'",
+          },
+
+        },
+        {
+          selectionPattern: "\\[PostUpdateFeedMessages Error\\].*",
+          statusCode: "400",
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': "'*'",
+            'method.response.header.Access-Control-Allow-Methods': "'*'",
+            'method.response.header.Access-Control-Allow-Headers': "'*'",
+          },
+        },
+        {
+          selectionPattern: "/^5\\d{2}$/",
+          statusCode: "500",
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': "'*'",
+            'method.response.header.Access-Control-Allow-Methods': "'*'",
+            'method.response.header.Access-Control-Allow-Headers': "'*'",
+          },
+        }
+      ],
+    });
+
+    postUpdateFeedMessages.addMethod("POST", postUpdateFeedMessagesIntegration, {
+      methodResponses: [
+      {
+        statusCode: "200",
+        responseParameters: {
+          'method.response.header.Access-Control-Allow-Origin': true,
+          'method.response.header.Access-Control-Allow-Methods': true,
+          'method.response.header.Access-Control-Allow-Headers': true,
+        },
+      },
+      {
+        statusCode: "400",
+        responseParameters: {
+          'method.response.header.Access-Control-Allow-Origin': true,
+          'method.response.header.Access-Control-Allow-Methods': true,
+          'method.response.header.Access-Control-Allow-Headers': true,
+        },
+      },
+      {
+        statusCode: "500",
+        responseParameters: {
+          'method.response.header.Access-Control-Allow-Origin': true,
+          'method.response.header.Access-Control-Allow-Methods': true,
+          'method.response.header.Access-Control-Allow-Headers': true,
+        },
+      }
+      ],
+    });
+
+    // UpdateFeedsLambda
+    const updateFeedsLambda = new NodejsFunction(this, "UpdateFeedsHandler", {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      entry: lambda_dir + "UpdateFeedsLambda.ts",
+      handler: "handler",
+      timeout: cdk.Duration.seconds(180),
+    });
+
+    const updateFeeds = service.addResource("updateFeeds", {
+      defaultCorsPreflightOptions: {
+        allowOrigins: apigateway.Cors.ALL_ORIGINS,
+        allowMethods: apigateway.Cors.ALL_METHODS,
+      },
+    });
+
+    const updateFeedsIntegration = new apigateway.LambdaIntegration(updateFeedsLambda, {
+      proxy: false,
+      integrationResponses: [
+        {
+          statusCode: "200",
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': "'*'",
+            'method.response.header.Access-Control-Allow-Methods': "'*'",
+            'method.response.header.Access-Control-Allow-Headers': "'*'",
+          },
+
+        },
+        {
+          selectionPattern: "\\[UpdateFeeds Error\\].*",
+          statusCode: "400",
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': "'*'",
+            'method.response.header.Access-Control-Allow-Methods': "'*'",
+            'method.response.header.Access-Control-Allow-Headers': "'*'",
+          },
+        },
+        {
+          selectionPattern: "/^5\\d{2}$/",
+          statusCode: "500",
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': "'*'",
+            'method.response.header.Access-Control-Allow-Methods': "'*'",
+            'method.response.header.Access-Control-Allow-Headers': "'*'",
+          },
+        }
+      ],
+    });
+
+    updateFeeds.addMethod("POST", updateFeedsIntegration, {
+      methodResponses: [
+      {
+        statusCode: "200",
+        responseParameters: {
+          'method.response.header.Access-Control-Allow-Origin': true,
+          'method.response.header.Access-Control-Allow-Methods': true,
+          'method.response.header.Access-Control-Allow-Headers': true,
+        },
+      },
+      {
+        statusCode: "400",
+        responseParameters: {
+          'method.response.header.Access-Control-Allow-Origin': true,
+          'method.response.header.Access-Control-Allow-Methods': true,
+          'method.response.header.Access-Control-Allow-Headers': true,
+        },
+      },
+      {
+        statusCode: "500",
+        responseParameters: {
+          'method.response.header.Access-Control-Allow-Origin': true,
+          'method.response.header.Access-Control-Allow-Methods': true,
+          'method.response.header.Access-Control-Allow-Headers': true,
+        },
+      }
+      ],
+    });
+
     const userProfileImagesBucket = new cdk.aws_s3.Bucket(this, "ImagesBucket340", {
       bucketName: "tweeter-user-profile-images-bucket-cs340-v1",
       removalPolicy: cdk.RemovalPolicy.DESTROY,
@@ -1182,7 +1339,8 @@ export class TweeterService extends Construct {
       billing: dynamodb.Billing.provisioned(
         {
           readCapacity: dynamodb.Capacity.fixed(1),
-          writeCapacity: dynamodb.Capacity.autoscaled({ maxCapacity: 1 }),
+          writeCapacity: dynamodb.Capacity.autoscaled({ maxCapacity: 100 }),
+          // writeCapacity: dynamodb.Capacity.(100),
         }
       ),
     });
@@ -1194,7 +1352,7 @@ export class TweeterService extends Construct {
       billing: dynamodb.Billing.provisioned(
         {
           readCapacity: dynamodb.Capacity.fixed(1),
-          writeCapacity: dynamodb.Capacity.autoscaled({ maxCapacity: 1 }),
+          writeCapacity: dynamodb.Capacity.autoscaled({ maxCapacity: 100 }),
         }
       )
     });
@@ -1243,7 +1401,7 @@ Click 'Create table' at the bottom of the page.
       billing: dynamodb.Billing.provisioned(
         {
           readCapacity: dynamodb.Capacity.fixed(1),
-          writeCapacity: dynamodb.Capacity.autoscaled({ maxCapacity: 1 }),
+          writeCapacity: dynamodb.Capacity.autoscaled({ maxCapacity: 100 }),
         }
       )
     });
@@ -1273,7 +1431,10 @@ Click 'Create table' at the bottom of the page.
                 "dynamodb:BatchWriteItem",
                 "dynamodb:DescribeTable",
                 "dynamodb:GetRecords",
-                "s3:PutObject"],
+                "s3:PutObject",
+                "sqd:SendMessage",
+                "sqs:ReceiveMessage",
+              ],
       resources: [userTable.tableArn,
                   feedTable.tableArn,
                   storyTable.tableArn,
@@ -1297,9 +1458,32 @@ Click 'Create table' at the bottom of the page.
     getIsFollowerStatusLambda.addToRolePolicy(policy);
     getFollowersCountLambda.addToRolePolicy(policy);
     getFolloweesCountLambda.addToRolePolicy(policy);
+    postUpdateFeedMessagesLambda.addToRolePolicy(policy);
+    updateFeedsLambda.addToRolePolicy(policy);
 
 
+    // Create a SQS Post Status Queue and give post status lambda permission to send messages to it and postUpdateFeedMessagesLambda permission to receive messages from it
+    const postStatusQueue = new sqs.Queue(this, "PostStatusQueue", {
+      visibilityTimeout: cdk.Duration.seconds(300),
+    });
+    postStatusQueue.grantSendMessages(postStatusLambda);
+    postStatusQueue.grantConsumeMessages(postUpdateFeedMessagesLambda);
 
-    
+    // Create a SQS Update Feed Queue and give postUpdateFeedMessagesLambda permission to send messages to it and updateFeedLambda permission to receive messages from it
+    const updateFeedQueue = new sqs.Queue(this, "UpdateFeedQueue", {
+      visibilityTimeout: cdk.Duration.seconds(300),
+    });
+    updateFeedQueue.grantSendMessages(postUpdateFeedMessagesLambda);
+    updateFeedQueue.grantConsumeMessages(updateFeedsLambda);
+
+    // Make the postUpdateFeedMessagesLambda trigger on messages from the postStatusQueue
+    postUpdateFeedMessagesLambda.addEventSource(new SqsEventSource(postStatusQueue, {
+      batchSize: 1,
+    }));
+
+    // Make the updateFeedsLambda trigger on messages from the updateFeedQueue
+    updateFeedsLambda.addEventSource(new SqsEventSource(updateFeedQueue, {
+      batchSize: 1,
+    }));
   }
 }

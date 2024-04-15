@@ -20,6 +20,15 @@ export class UserNavigationPresenter extends Presenter<UserNavigationView> {
 
   private extractAlias(value: string): string {
       let index = value.indexOf("@");
+      if (index === -1) {
+          // http://localhost:5173/following/alias0 or http://localhost:5173/followers/myuser
+          index = value.indexOf("/following/");
+          index += "/following/".length; // "following/"
+          if (index === -1) {
+              index = value.indexOf("/followers/");
+              index += "/followers/".length; // "followers/"
+          }
+      }
       return value.substring(index);
   }
 

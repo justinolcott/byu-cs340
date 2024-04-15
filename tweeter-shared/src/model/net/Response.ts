@@ -33,6 +33,17 @@ export interface PostStatusResponse extends TweeterResponse {
   
 }
 
+// unused
+export interface PostUpdateFeedMessagesResponse extends TweeterResponse {
+  newStatus: StatusDto;
+  followers: UserDto[];
+}
+
+//unused
+export interface UpdateFeedsResponse extends TweeterResponse {
+
+}
+
 export interface LogoutResponse extends TweeterResponse {
     
 }
@@ -150,6 +161,24 @@ export class TweeterResponseFactory {
   ): GetFolloweesCountResponse {
     return { success, followeesCount, message };
   }
+
+  static createPostUpdateFeedMessagesResponse(
+    success: boolean,
+    newStatus: StatusDto,
+    followers: UserDto[],
+    message: string | null = null
+  ): PostUpdateFeedMessagesResponse {
+    return { success, newStatus, followers, message };
+  }
+
+  static createUpdateFeedsResponse(
+    success: boolean,
+    message: string | null = null
+  ): UpdateFeedsResponse {
+    return { success, message };
+  }
+
+
 }
 
 // export class TweeterResponse {

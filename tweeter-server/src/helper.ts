@@ -1,18 +1,123 @@
-import { handler } from './lambda/LoadMoreFeedItemsLambda';
+/**
+ * Add a main user
+ * Add 10,000 users
+ * 
+ * Make the main user follow 10,000 users
+ * Make the 10,000 users follow the main user
+ * 
+ * Have the main user post a status
+ */
+
+import { User } from "tweeter-shared";
+import { Factory } from "./dao/DAOInterfaces";
+import { UserService } from "./model/service/UserService";
+import { FollowService } from "./model/service/FollowService";
 
 
-const raw_input = {"authToken":{"_token":"23971388-9ac8-4061-b12f-513f50cf359f","_timestamp":1711083980922},"user":{"_firstName":"Allen","_lastName":"Anderson","_alias":"@allen","_imageUrl":"https://faculty.cs.byu.edu/~jwilkerson/cs340/tweeter/images/donald_duck.png"},"pageSize":10,"lastItem":{"_post":"Post 0 9\n        My friend @frank likes this website: http://byu.edu. Do you? \n        Or do you prefer this one: http://cs.byu.edu?","_user":{"_firstName":"Elizabeth","_lastName":"Engle","_alias":"@elizabeth","_imageUrl":"https://faculty.cs.byu.edu/~jwilkerson/cs340/tweeter/images/daisy_duck.png"},"_timestamp":270000000000,"_segments":[{"_text":"Post 0 9","_startPostion":0,"_endPosition":7,"_type":"Text"},{"_text":"\n","_startPostion":8,"_endPosition":9,"_type":"Newline"},{"_text":"        My friend ","_startPostion":9,"_endPosition":26,"_type":"Text"},{"_text":"@frank","_startPostion":27,"_endPosition":33,"_type":"Alias"},{"_text":" likes this website: ","_startPostion":33,"_endPosition":53,"_type":"Text"},{"_text":"http://byu.edu","_startPostion":54,"_endPosition":68,"_type":"URL"},{"_text":". Do you? ","_startPostion":68,"_endPosition":77,"_type":"Text"},{"_text":"\n","_startPostion":78,"_endPosition":79,"_type":"Newline"},{"_text":"        Or do you prefer this one: ","_startPostion":79,"_endPosition":113,"_type":"Text"},{"_text":"http://cs.byu.edu","_startPostion":114,"_endPosition":131,"_type":"URL"},{"_text":"?","_startPostion":131,"_endPosition":132,"_type":"Text"}]}}
-const input = JSON.parse(JSON.stringify(raw_input));
-console.log(input.lastItem._user);
+async function main() {
+  const mainUser = new User(
+    "mainfirstName",
+    "mainlastName",
+    "mainalias",
+    "https://faculty.cs.byu.edu/~jwilkerson/cs340/tweeter/images/donald_duck.png"
+  )
 
-const output = handler(input);
+  const users: User[] = [];
+  for (let i = 0; i < 10000; i++) {
+    users.push(new User(
+      "firstName",
+      "lastName",
+      `alias${i}`,
+      "https://faculty.cs.byu.edu/~jwilkerson/cs340/tweeter/images/donald_duck.png"
+    ));
+  }
 
+  const userTableDao = Factory.instance().createUserTableDAO();
+  const userService = new UserService();
+  console.log("registering main user");
+  // await userService.register(
+  //   mainUser.firstName,
+  //   mainUser.lastName,
+  //   mainUser.alias,
+  //   "password",
+  //   mainUser.imageUrl
+  // );
+  
+  // batched put users
+  const batchedUsers: User[][] = [];
+  for (let i = 0; i < 10000; i += 25) {
+    batchedUsers.push(users.slice(i, i + 25));
+  }
 
-// I want to test LoadMoreFeedItemsLambda.ts
-console.log("Starting");
-output.then((response) => {
-  console.log(response);
-}).catch((error) => {
-  console.log(error);
+  // console.log("registering users");
+  // for (const batch of batchedUsers) {
+  //   console.log("batch");
+  //   await userTableDao.batchWriteUsers(batch, 1, 1);
+  //   await new Promise((resolve) => setTimeout(resolve, 1000));
+  // }
+
+  // now add follows
+  const followsTableDao = Factory.instance().createFollowsTableDAO();
+  const followService = new FollowService();
+
+  // main user follows all users
+  let mainfollows: {
+    followerAlias: string,
+    followeeAlias: string
+  }[] = [];
+
+  let userfollows: {
+    followerAlias: string,
+    followeeAlias: string
+  }[] = [];
+
+  for (const user of users) {
+    mainfollows.push({
+      followerAlias: mainUser.alias,
+      followeeAlias: user.alias
+    });
+  }
+
+  for (const user of users) {
+    userfollows.push({
+      followerAlias: user.alias,
+      followeeAlias: mainUser.alias
+    });
+  }
+
+  const batchedMainFollows: {
+    followerAlias: string,
+    followeeAlias: string
+  }[][] = [];
+
+  const batchedUserFollows: {
+    followerAlias: string,
+    followeeAlias: string
+  }[][] = [];
+
+  // it broke after 4299
+  for (let i = 0; i < 10000; i += 25) {
+    if (i > 4299) {
+      batchedMainFollows.push(mainfollows.slice(i, i + 25));
+    }
+    batchedUserFollows.push(userfollows.slice(i, i + 25));
+  }
+
+  console.log("adding main follows");
+  for (const batch of batchedMainFollows) {
+    // await followsTableDao.batchWriteFollows(batch);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+  }
+
+  console.log("adding user follows");
+  for (const batch of batchedUserFollows) {
+    // await followsTableDao.batchWriteFollows(batch);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+  }
 }
-);
+
+main();
+
+/**
+ * I have added all the above follows and users
+ */

@@ -60,8 +60,8 @@ export class UserService {
     Factory.instance().createUserTableDAO().putUser(
       user,
       hash,
-      // 0,
-      // 0
+      0,
+      0
     );
 
     if (user === null) {

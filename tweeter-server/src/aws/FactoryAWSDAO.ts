@@ -1,10 +1,12 @@
-import { AuthTokenTableDAO, DAOFactory, FeedTableDAO, FollowsTableDAO, ProfileImageDAO, StoryTableDAO, UserTableDAO } from "../dao/DAOInterfaces";
+import { AuthTokenTableDAO, DAOFactory, FeedTableDAO, FollowsTableDAO, ProfileImageDAO, SQSPostStatusDAO, SQSUpdateFeedDAO, StoryTableDAO, UserTableDAO } from "../dao/DAOInterfaces";
 import { AuthTokenAWSDAO } from "./dynamo/AuthTokenTableAWSDAO";
 import { FeedTableAWSDAO } from "./dynamo/FeedTableAWSDAO";
 import { FollowsTableAWSDAO } from "./dynamo/FollowsTableAWSDAO";
 import { StoryTableAWSDAO } from "./dynamo/StoryTableAWSDAO";
 import { UserTableAWSDAO } from "./dynamo/UserTableAWSDAO";
 import { ProfileImageAWSDAO } from "./s3/ProfileImageAWSDAO";
+import { PostStatusQueueAWSDAO } from "./sqs/PostStatusQueueAWSDAO";
+import { UpdateFeedQueueAWSDAO } from "./sqs/UpdateFeedQueueAWSDAO";
 
 
 export class FactoryAWSDAO implements DAOFactory {
@@ -30,5 +32,13 @@ export class FactoryAWSDAO implements DAOFactory {
 
   createFollowsTableDAO(): FollowsTableDAO {
     return new FollowsTableAWSDAO();
+  }
+
+  createPostStatusQueueDAO(): SQSPostStatusDAO {
+    return new PostStatusQueueAWSDAO();
+  }
+
+  createUpdateFeedQueueDAO(): SQSUpdateFeedDAO {
+    return new UpdateFeedQueueAWSDAO();
   }
 }

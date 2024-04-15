@@ -1,4 +1,5 @@
 import {
+  BatchWriteCommand,
   DeleteCommand,
   DynamoDBDocumentClient,
   GetCommand,
@@ -40,15 +41,15 @@ export class UserTableAWSDAO implements UserTableDAO {
   async putUser(
     user: User,
     hash: string,
-    // followersCount: number,
-    // followeesCount: number
+    followersCount: number,
+    followeesCount: number
     ): Promise<void> {
     const userDto = user.dto;
     const userItem = {
       ...userDto,
       hash: hash,
-      // followersCount: followersCount,
-      // followeesCount: followeesCount
+      followersCount: followersCount,
+      followeesCount: followeesCount
     }
 
     await this.client.send(
@@ -59,43 +60,98 @@ export class UserTableAWSDAO implements UserTableDAO {
     );
   }
 
-  // async getFollowersCount(alias: string): Promise<number> {
-  //   const response = await this.client.send(
-  //     new GetCommand({
-  //       TableName: this.tableName,
-  //       Key: {
-  //         alias: alias,
-  //       },
-  //       ProjectionExpression: "followersCount",
-  //     })
-  //   );
+  async getFollowersCount(alias: string): Promise<number> {
+    const response = await this.client.send(
+      new GetCommand({
+        TableName: this.tableName,
+        Key: {
+          alias: alias,
+        },
+        ProjectionExpression: "followersCount",
+      })
+    );
 
-  //   const userItem = response.Item;
-  //   if (!userItem) {
-  //     return 0;
-  //   }
+    const userItem = response.Item;
+    if (!userItem) {
+      return 0;
+    }
 
-  //   return userItem.followersCount;
-  // }
+    return userItem.followersCount;
+  }
 
-  // async getFolloweesCount(alias: string): Promise<number> {
-  //   const response = await this.client.send(
-  //     new GetCommand({
-  //       TableName: this.tableName,
-  //       Key: {
-  //         alias: alias,
-  //       },
-  //       ProjectionExpression: "followeesCount",
-  //     })
-  //   );
+  async getFolloweesCount(alias: string): Promise<number> {
+    const response = await this.client.send(
+      new GetCommand({
+        TableName: this.tableName,
+        Key: {
+          alias: alias,
+        },
+        ProjectionExpression: "followeesCount",
+      })
+    );
 
-  //   const userItem = response.Item;
-  //   if (!userItem) {
-  //     return 0;
-  //   }
+    const userItem = response.Item;
+    if (!userItem) {
+      return 0;
+    }
 
-  //   return userItem.followeesCount;
-  // }
+    return userItem.followeesCount;
+  }
+
+
+  /**
+   * 
+   * @param alias 
+   * @returns followersCount, followeesCount
+   */
+  async getFollowCount(alias: string): Promise<[number, number]> {
+    const response = await this.client.send(
+      new GetCommand({
+        TableName: this.tableName,
+        Key: {
+          alias: alias,
+        },
+        ProjectionExpression: "followersCount, followeesCount",
+      })
+    );
+
+    const userItem = response.Item;
+    if (!userItem) {
+      return [0, 0];
+    }
+
+    return [userItem.followersCount, userItem.followeesCount];
+  }
+
+  async incrementFollowersCount(alias: string): Promise<void> {
+    await this.client.send(
+      new UpdateCommand({
+        TableName: this.tableName,
+        Key: {
+          alias: alias,
+        },
+        UpdateExpression: "SET followersCount = followersCount + :inc",
+        ExpressionAttributeValues: {
+          ":inc": 1,
+        },
+      })
+    );
+  }
+
+  async decrementFollowersCount(alias: string): Promise<void> {
+    await this.client.send(
+      new UpdateCommand({
+        TableName: this.tableName,
+        Key: {
+          alias: alias,
+        },
+        UpdateExpression: "SET followersCount = followersCount - :dec",
+        ExpressionAttributeValues: {
+          ":dec": 1,
+        },
+      })
+    );
+  }
 
   async getUser(alias: string): Promise<User | null> {
     const response = await this.client.send(
@@ -177,6 +233,27 @@ export class UserTableAWSDAO implements UserTableDAO {
         })
       );
     }
+  }
+
+  async batchWriteUsers(users: User[], followersCount: number, followeesCount: number): Promise<void> {
+    const putRequests = users.map((user) => ({
+      PutRequest: {
+        Item: {
+          ...user.dto,
+          hash: "",
+          followersCount: followersCount,
+          followeesCount: followeesCount,
+        }
+      },
+    }));
+
+    await this.client.send(
+      new BatchWriteCommand({
+        RequestItems: {
+          [this.tableName]: putRequests,
+        },
+      })
+    );
   }
   
 }

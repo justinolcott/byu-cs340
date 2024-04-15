@@ -22,6 +22,7 @@
     });
  */
 import {
+  BatchWriteCommand,
   DeleteCommand,
   DynamoDBDocumentClient,
   GetCommand,
@@ -37,7 +38,6 @@ import { User } from "tweeter-shared";
 
 export class FollowsTableAWSDAO implements FollowsTableDAO {
   readonly tableName: string = "FollowersTable";
-  readonly pageSize: number = 10;
   
   async follow(followerAlias: string, followeeAlias: string): Promise<void> {
     const client = DynamoDBDocumentClient.from(new DynamoDBClient());
@@ -90,7 +90,7 @@ export class FollowsTableAWSDAO implements FollowsTableDAO {
       )
     });
    */
-  async loadMoreFollowees(alias: string, lastFolloweeAlias: string): Promise<[string[], boolean]> {
+  async loadMoreFollowees(alias: string, lastFolloweeAlias: string, pageSize: number): Promise<[string[], boolean]> {
     const client = DynamoDBDocumentClient.from(new DynamoDBClient());
     const result = await client.send(
       new QueryCommand({
@@ -104,7 +104,7 @@ export class FollowsTableAWSDAO implements FollowsTableDAO {
             followerAlias: alias,
             followeeAlias: lastFolloweeAlias,
           },
-        Limit: this.pageSize,
+        Limit: pageSize,
       })
     );
     const users = result.Items?.map((item: any) => item.followeeAlias) ?? [];
@@ -112,7 +112,7 @@ export class FollowsTableAWSDAO implements FollowsTableDAO {
     return [users, hasMore];
   }
 
-  async loadMoreFollowers(alias: string, lastFollowerAlias: string): Promise<[string[], boolean]> {
+  async loadMoreFollowers(alias: string, lastFollowerAlias: string, pageSize: number): Promise<[string[], boolean]> {
     const client = DynamoDBDocumentClient.from(new DynamoDBClient());
     const result = await client.send(
       new QueryCommand({
@@ -127,7 +127,7 @@ export class FollowsTableAWSDAO implements FollowsTableDAO {
             followeeAlias: alias,
             followerAlias: lastFollowerAlias,
           },
-        Limit: this.pageSize,
+        Limit: pageSize,
       })
     );
     const users = result.Items?.map((item: any) => item.followerAlias) ?? [];
@@ -136,45 +136,45 @@ export class FollowsTableAWSDAO implements FollowsTableDAO {
   }
 
 
-  async getFollowers(alias: string): Promise<string[]> {
-    console.log("alias: ", alias);
-    const client = DynamoDBDocumentClient.from(new DynamoDBClient());
-    const result = await client.send(
-      new QueryCommand({
-        TableName: this.tableName,
-        IndexName: "FollowsIndex",
-        KeyConditionExpression: "followeeAlias = :alias",
-        ExpressionAttributeValues: {
-          ":alias": alias,
-        }
-      })
-    );
-    return result.Items?.map((item: any) => item.followerAlias) ?? [];
-  }
+  // async getFollowers(alias: string): Promise<string[]> {
+  //   console.log("alias: ", alias);
+  //   const client = DynamoDBDocumentClient.from(new DynamoDBClient());
+  //   const result = await client.send(
+  //     new QueryCommand({
+  //       TableName: this.tableName,
+  //       IndexName: "FollowsIndex",
+  //       KeyConditionExpression: "followeeAlias = :alias",
+  //       ExpressionAttributeValues: {
+  //         ":alias": alias,
+  //       }
+  //     })
+  //   );
+  //   return result.Items?.map((item: any) => item.followerAlias) ?? [];
+  // }
 
-  async getFollowees(alias: string): Promise<string[]> {
-    const client = DynamoDBDocumentClient.from(new DynamoDBClient());
-    const result = await client.send(
-      new QueryCommand({
-        TableName: this.tableName,
-        KeyConditionExpression: "followerAlias = :alias",
-        ExpressionAttributeValues: {
-          ":alias": alias,
-        }
-      })
-    );
-    return result.Items?.map((item: any) => item.followeeAlias) ?? [];
-  }
+  // async getFollowees(alias: string): Promise<string[]> {
+  //   const client = DynamoDBDocumentClient.from(new DynamoDBClient());
+  //   const result = await client.send(
+  //     new QueryCommand({
+  //       TableName: this.tableName,
+  //       KeyConditionExpression: "followerAlias = :alias",
+  //       ExpressionAttributeValues: {
+  //         ":alias": alias,
+  //       }
+  //     })
+  //   );
+  //   return result.Items?.map((item: any) => item.followeeAlias) ?? [];
+  // }
 
-  async getFolloweesCount(alias: string): Promise<number> {
-    const followings = await this.getFollowees(alias);
-    return followings.length;
-  }
+  // async getFolloweesCount(alias: string): Promise<number> {
+  //   const followings = await this.getFollowees(alias);
+  //   return followings.length;
+  // }
 
-  async getFollowersCount(alias: string): Promise<number> {
-    const followers = await this.getFollowers(alias);
-    return followers.length;
-  }
+  // async getFollowersCount(alias: string): Promise<number> {
+  //   const followers = await this.getFollowers(alias);
+  //   return followers.length;
+  // }
 
   async getIsFollower(followerAlias: string, followeeAlias: string): Promise<boolean> {
     const client = DynamoDBDocumentClient.from(new DynamoDBClient());
@@ -188,5 +188,21 @@ export class FollowsTableAWSDAO implements FollowsTableDAO {
       })
     );
     return result.Item !== undefined;
+  }
+
+  async batchWriteFollows(follows: {followerAlias: string, followeeAlias: string}[]): Promise<void> {
+    const client = DynamoDBDocumentClient.from(new DynamoDBClient());
+    const putRequests = follows.map((follow) => ({
+      PutRequest: {
+        Item: follow,
+      }
+    }));
+    await client.send(
+      new BatchWriteCommand({
+        RequestItems: {
+          [this.tableName]: putRequests,
+        }
+      })
+    );
   }
 }
