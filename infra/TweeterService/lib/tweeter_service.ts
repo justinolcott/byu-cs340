@@ -1340,11 +1340,12 @@ export class TweeterService extends Construct {
         {
           readCapacity: dynamodb.Capacity.fixed(1),
           writeCapacity: dynamodb.Capacity.autoscaled({ maxCapacity: 100 }),
-          // writeCapacity: dynamodb.Capacity.(100),
+          // writeCapacity: dynamodb.Capacity.fixed(100),
         }
       ),
     });
 
+    // i want to delete the table whenever I redeploy the stack
     const feedTable = new dynamodb.TableV2(this, "FeedTable", {
       partitionKey: { name: "receiverAlias", type: dynamodb.AttributeType.STRING },
       sortKey: { name: "timestamp", type: dynamodb.AttributeType.NUMBER },
@@ -1354,7 +1355,8 @@ export class TweeterService extends Construct {
           readCapacity: dynamodb.Capacity.fixed(1),
           writeCapacity: dynamodb.Capacity.autoscaled({ maxCapacity: 100 }),
         }
-      )
+      ),
+      
     });
 
     const storyTable = new dynamodb.TableV2(this, "StoryTable", {

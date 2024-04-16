@@ -35,11 +35,10 @@ export class StatusService {
     if (!AuthToken.isValid(authToken)) {
       throw new Error("Invalid AuthToken");
     }
-    Factory.instance().createAuthTokenTableDAO().updateAuthToken(authToken);
+    // Factory.instance().createAuthTokenTableDAO().updateAuthToken(authToken);
 
     const StoryTableDAO = Factory.instance().createStoryTableDAO();
     const postStatusQueueDAO = Factory.instance().createPostStatusQueueDAO();
-
     newStatus.timestamp = new Date().getTime();
 
     const message = JSON.stringify(newStatus);
